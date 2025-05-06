@@ -269,6 +269,7 @@ class GetPerformanceDataCommand extends LockableCommand
                 $params = $this->getModuleParams($moduleValue);
                 foreach ($params as $paramsValue) {
                     // 格式化一下传过去的参数
+                    $formattingParamsValue = [];
                     foreach ($paramsValue as $item) {
                         $formattingParamsValue[] = $item;
                     }

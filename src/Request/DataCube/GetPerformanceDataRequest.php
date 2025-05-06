@@ -9,6 +9,10 @@ use WechatMiniProgramBundle\Request\WithAccountRequest;
  */
 class GetPerformanceDataRequest extends WithAccountRequest
 {
+    private array $params;
+    private object $time;
+    private int $module;
+
     public function getRequestPath(): string
     {
         return '/wxa/business/performance/boot';
