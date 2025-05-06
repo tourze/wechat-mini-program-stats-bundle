@@ -4,7 +4,6 @@ namespace WechatMiniProgramStatsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
 use WechatMiniProgramStatsBundle\Entity\OperationPerformance;
 
 /**
@@ -15,8 +14,6 @@ use WechatMiniProgramStatsBundle\Entity\OperationPerformance;
  */
 class OperationPerformanceRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, OperationPerformance::class);

@@ -2,7 +2,6 @@
 
 namespace WechatMiniProgramStatsBundle\Command\DataCube;
 
-use AppBundle\Repository\BizUserRepository;
 use Carbon\Carbon;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -15,7 +14,6 @@ use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Entity\HourVisitData;
 use WechatMiniProgramStatsBundle\Repository\HourVisitDataRepository;
-use WechatMiniProgramTrackingBundle\Repository\PageVisitLogRepository;
 
 #[AsCronTask('46 * * * *')]
 #[AsCronTask('13 * * * *')]
@@ -26,8 +24,6 @@ class CountWechatHourVisitDataCommand extends LockableCommand
         private readonly AccountRepository $accountRepository,
         private readonly HourVisitDataRepository $wechatHourVisitDataRepository,
         private readonly RequestLogRepository $logRepository,
-        private readonly BizUserRepository $bizUserRepository,
-        private readonly PageVisitLogRepository $pageLogRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
@@ -49,29 +45,33 @@ class CountWechatHourVisitDataCommand extends LockableCommand
             ->setParameter('end', $end->clone())
             ->getQuery()
             ->getScalarResult();
-        $newUser = $this->bizUserRepository->createQueryBuilder('u')
-            ->select('count(1)')
-            ->where('u.createTime between :start and :end')
-            ->setParameter('start', $start->clone())
-            ->setParameter('end', $end->clone())
-            ->getQuery()
-            ->getSingleScalarResult();
+//        $newUser = $this->bizUserRepository->createQueryBuilder('u')
+//            ->select('count(1)')
+//            ->where('u.createTime between :start and :end')
+//            ->setParameter('start', $start->clone())
+//            ->setParameter('end', $end->clone())
+//            ->getQuery()
+//            ->getSingleScalarResult();
+        $newUser = 0;
 
-        $pageVisit = $this->pageLogRepository->createQueryBuilder('u')
-            ->select('count(1)')
-            ->where('u.createTime between :start and :end')
-            ->setParameter('start', $start->clone())
-            ->setParameter('end', $end->clone())
-            ->getQuery()
-            ->getSingleScalarResult();
+//        $pageVisit = $this->pageLogRepository->createQueryBuilder('u')
+//            ->select('count(1)')
+//            ->where('u.createTime between :start and :end')
+//            ->setParameter('start', $start->clone())
+//            ->setParameter('end', $end->clone())
+//            ->getQuery()
+//            ->getSingleScalarResult();
+        $pageVisit = 0;
 
-        $newUserArr = $this->bizUserRepository->createQueryBuilder('u')
-            ->select('u.username')
-            ->where('u.createTime between :start and :end')
-            ->setParameter('start', $start->clone()->startOfDay())
-            ->setParameter('end', $end->clone())
-            ->getQuery()
-            ->getSingleColumnResult();
+//        $newUserArr = $this->bizUserRepository->createQueryBuilder('u')
+//            ->select('u.username')
+//            ->where('u.createTime between :start and :end')
+//            ->setParameter('start', $start->clone()->startOfDay())
+//            ->setParameter('end', $end->clone())
+//            ->getQuery()
+//            ->getSingleColumnResult();
+        $newUserArr = [];
+
         $newVisitData = $this->logRepository->createQueryBuilder('l')
             ->select('count(1) as pv')
             ->where('l.createTime between :start and :end and l.createdBy in (:createdBy)')
@@ -81,14 +81,16 @@ class CountWechatHourVisitDataCommand extends LockableCommand
             ->getQuery()
             ->getSingleScalarResult();
 
-        $pageNewUserVisit = $this->pageLogRepository->createQueryBuilder('u')
-            ->select('count(1)')
-            ->where('u.createTime between :start and :end and u.createdBy in (:createdBy)')
-            ->setParameter('start', $start->clone())
-            ->setParameter('end', $end->clone())
-            ->setParameter('createdBy', $newUserArr)
-            ->getQuery()
-            ->getSingleScalarResult();
+//        $pageNewUserVisit = $this->pageLogRepository->createQueryBuilder('u')
+//            ->select('count(1)')
+//            ->where('u.createTime between :start and :end and u.createdBy in (:createdBy)')
+//            ->setParameter('start', $start->clone())
+//            ->setParameter('end', $end->clone())
+//            ->setParameter('createdBy', $newUserArr)
+//            ->getQuery()
+//            ->getSingleScalarResult();
+        $pageNewUserVisit = 0;
+
         var_dump($newUserArr, $newVisitData, $pageNewUserVisit);
         $entity = $this->wechatHourVisitDataRepository->findOneBy([
             'account' => $account,

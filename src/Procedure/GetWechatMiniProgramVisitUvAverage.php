@@ -103,7 +103,7 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
 
     protected function getCacheDuration(JsonRpcRequest $request): int
     {
-        return HOUR_IN_SECONDS;
+        return 60 * 60;
     }
 
     protected function getCacheTags(JsonRpcRequest $request): iterable

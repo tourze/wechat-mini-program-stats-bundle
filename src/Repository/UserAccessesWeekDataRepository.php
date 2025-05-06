@@ -4,7 +4,6 @@ namespace WechatMiniProgramStatsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
 use WechatMiniProgramStatsBundle\Entity\UserAccessesWeekData;
 
 /**
@@ -15,8 +14,6 @@ use WechatMiniProgramStatsBundle\Entity\UserAccessesWeekData;
  */
 class UserAccessesWeekDataRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, UserAccessesWeekData::class);

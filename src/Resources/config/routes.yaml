@@ -1,3 +1,0 @@
-wechat_mini_program_stats_controllers:
-  resource: '../../Controller/'
-  type: attribute

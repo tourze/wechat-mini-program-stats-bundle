@@ -4,7 +4,6 @@ namespace WechatMiniProgramStatsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitData;
 
 /**
@@ -15,8 +14,6 @@ use WechatMiniProgramStatsBundle\Entity\UserPortraitData;
  */
 class UserPortraitDataRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, UserPortraitData::class);
