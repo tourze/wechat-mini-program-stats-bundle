@@ -8,7 +8,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Tourze\JsonRPCLogBundle\Repository\RequestLogRepository;
 use Tourze\LockCommandBundle\Command\LockableCommand;
 use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 use WechatMiniProgramBundle\Repository\AccountRepository;
@@ -23,7 +22,6 @@ class CountWechatHourVisitDataCommand extends LockableCommand
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly HourVisitDataRepository $wechatHourVisitDataRepository,
-        private readonly RequestLogRepository $logRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
@@ -38,13 +36,13 @@ class CountWechatHourVisitDataCommand extends LockableCommand
         //        $end = Carbon::parse('2023-08-16 10:33:11')->endOfHour();
 
         $account = $this->accountRepository->findOneBy(['valid' => true]);
-        $data = $this->logRepository->createQueryBuilder('l')
-            ->select('count(1) as pv,count(DISTINCT l.createdBy) as uv')
-            ->where('l.createTime between :start and :end')
-            ->setParameter('start', $start->clone())
-            ->setParameter('end', $end->clone())
-            ->getQuery()
-            ->getScalarResult();
+//        $data = $this->logRepository->createQueryBuilder('l')
+//            ->select('count(1) as pv,count(DISTINCT l.createdBy) as uv')
+//            ->where('l.createTime between :start and :end')
+//            ->setParameter('start', $start->clone())
+//            ->setParameter('end', $end->clone())
+//            ->getQuery()
+//            ->getScalarResult();
 //        $newUser = $this->bizUserRepository->createQueryBuilder('u')
 //            ->select('count(1)')
 //            ->where('u.createTime between :start and :end')
@@ -72,14 +70,14 @@ class CountWechatHourVisitDataCommand extends LockableCommand
 //            ->getSingleColumnResult();
         $newUserArr = [];
 
-        $newVisitData = $this->logRepository->createQueryBuilder('l')
-            ->select('count(1) as pv')
-            ->where('l.createTime between :start and :end and l.createdBy in (:createdBy)')
-            ->setParameter('start', $start->clone())
-            ->setParameter('end', $end->clone())
-            ->setParameter('createdBy', $newUserArr)
-            ->getQuery()
-            ->getSingleScalarResult();
+//        $newVisitData = $this->logRepository->createQueryBuilder('l')
+//            ->select('count(1) as pv')
+//            ->where('l.createTime between :start and :end and l.createdBy in (:createdBy)')
+//            ->setParameter('start', $start->clone())
+//            ->setParameter('end', $end->clone())
+//            ->setParameter('createdBy', $newUserArr)
+//            ->getQuery()
+//            ->getSingleScalarResult();
 
 //        $pageNewUserVisit = $this->pageLogRepository->createQueryBuilder('u')
 //            ->select('count(1)')

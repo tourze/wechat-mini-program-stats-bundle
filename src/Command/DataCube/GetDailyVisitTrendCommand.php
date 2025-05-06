@@ -17,7 +17,6 @@ use WechatMiniProgramBundle\Service\Client;
 use WechatMiniProgramStatsBundle\Entity\DailyVisitTrendData;
 use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 use WechatMiniProgramStatsBundle\Request\DataCube\GetDailyVisitTrendRequest;
-use Yiisoft\Json\Json;
 
 /**
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/visit-trend/getDailyVisitTrend.html
@@ -79,7 +78,7 @@ class GetDailyVisitTrendCommand extends LockableCommand
                 }
 
                 foreach ($res['list'] as $value) {
-                    $output->writeln(Json::encode($value));
+                    $output->writeln(json_encode($value, JSON_PRETTY_PRINT));
 
                     $log = $this->logRepository->findOneBy([
                         'date' => Carbon::parse($value['ref_date']),
