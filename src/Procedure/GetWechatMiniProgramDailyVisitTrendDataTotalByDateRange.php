@@ -3,6 +3,7 @@
 namespace WechatMiniProgramStatsBundle\Procedure;
 
 use Carbon\Carbon;
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
@@ -16,6 +17,7 @@ use Tourze\JsonRPCLogBundle\Attribute\Log;
 #[MethodTag('微信小程序')]
 #[MethodDoc('获取用户访问小程序指定时间段内的日趋势累计数据')]
 #[MethodExpose('GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange')]
+#[WithMonologChannel('procedure')]
 class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableProcedure
 {
     #[MethodParam('小程序ID')]
@@ -29,7 +31,7 @@ class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableP
 
     public function __construct(
         private readonly GetWechatMiniProgramDailyVisitTrendDataByDateRange $logic,
-        private readonly LoggerInterface $procedureLogger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -67,7 +69,7 @@ class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableP
         $res['visitUvCompare'] = $beforeVisitUvTotal > 0 ? round(($res['visitUvTotal'] - $beforeVisitUvTotal) / $beforeVisitUvTotal, 4) : null;
         $res['visitUvNewCompare'] = $beforeVisitUvNewTotal > 0 ? round(($res['visitUvNewTotal'] - $beforeVisitUvNewTotal) / $beforeVisitUvNewTotal, 4) : null;
 
-        $this->procedureLogger->info('所有数据', [
+        $this->logger->info('所有数据', [
             'res' => $res,
             'beforeSessionCntTotal' => $beforeSessionCntTotal,
             'beforeVisitPvTotal' => $beforeVisitPvTotal,

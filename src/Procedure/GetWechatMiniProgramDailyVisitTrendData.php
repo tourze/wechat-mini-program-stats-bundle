@@ -3,6 +3,7 @@
 namespace WechatMiniProgramStatsBundle\Procedure;
 
 use Carbon\Carbon;
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
@@ -20,6 +21,7 @@ use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 #[MethodTag('微信小程序')]
 #[MethodDoc('获取用户访问小程序数据日趋势')]
 #[MethodExpose('GetWechatMiniProgramDailyVisitTrendData')]
+#[WithMonologChannel('procedure')]
 class GetWechatMiniProgramDailyVisitTrendData extends CacheableProcedure
 {
     #[MethodParam('小程序ID')]
@@ -31,7 +33,7 @@ class GetWechatMiniProgramDailyVisitTrendData extends CacheableProcedure
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailyVisitTrendDataRepository $trendDataRepository,
-        private readonly LoggerInterface $procedureLogger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -60,7 +62,7 @@ class GetWechatMiniProgramDailyVisitTrendData extends CacheableProcedure
             'date' => Carbon::parse($this->date)->subDays(7)->startOfDay(),
         ]);
 
-        $this->procedureLogger->info('所有数据', [
+        $this->logger->info('所有数据', [
             'date' => Carbon::parse($this->date)->startOfDay(),
             'row' => $row,
             'beforeRow' => $beforeRow,

@@ -3,6 +3,7 @@
 namespace WechatMiniProgramStatsBundle\Procedure;
 
 use Carbon\Carbon;
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
@@ -22,6 +23,7 @@ use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 #[MethodTag('微信小程序')]
 #[MethodDoc('获取用户访问小程序人均打开次数')]
 #[MethodExpose('GetWechatMiniProgramVisitUvAverage')]
+#[WithMonologChannel('procedure')]
 class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
 {
     #[MethodParam('小程序ID')]
@@ -33,7 +35,7 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailyVisitTrendDataRepository $trendDataRepository,
-        private readonly LoggerInterface $procedureLogger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -83,7 +85,7 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
             ->getQuery()
             ->getSingleScalarResult();
 
-        $this->procedureLogger->info('所有数据', [
+        $this->logger->info('所有数据', [
             'visitUv' => intval($visitUv),
             'visitPv' => intval($visitPv),
             'beforeVisitUv' => intval($beforeVisitUv),
