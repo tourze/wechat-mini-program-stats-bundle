@@ -98,17 +98,17 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
         return $res;
     }
 
-    protected function getCacheKey(JsonRpcRequest $request): string
+    public function getCacheKey(JsonRpcRequest $request): string
     {
         return "GetWechatMiniProgramVisitUvAverage_{$request->getParams()->get('accountId')}_{$request->getParams()->get('day')}";
     }
 
-    protected function getCacheDuration(JsonRpcRequest $request): int
+    public function getCacheDuration(JsonRpcRequest $request): int
     {
         return 60 * 60;
     }
 
-    protected function getCacheTags(JsonRpcRequest $request): iterable
+    public function getCacheTags(JsonRpcRequest $request): iterable
     {
         yield null;
     }

@@ -80,19 +80,19 @@ class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableP
         return $res;
     }
 
-    protected function getCacheKey(JsonRpcRequest $request): string
+    public function getCacheKey(JsonRpcRequest $request): string
     {
         return "GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange_{$request->getParams()->get('accountId')}_" .
             Carbon::parse($request->getParams()->get('startDate'))->startOfDay()
             . '_' . Carbon::parse($request->getParams()->get('endDate'))->startOfDay();
     }
 
-    protected function getCacheDuration(JsonRpcRequest $request): int
+    public function getCacheDuration(JsonRpcRequest $request): int
     {
         return 60 * 60;
     }
 
-    protected function getCacheTags(JsonRpcRequest $request): iterable
+    public function getCacheTags(JsonRpcRequest $request): iterable
     {
         yield null;
     }
