@@ -40,7 +40,7 @@ class DailyPageVisitData implements AdminArrayInterface
 
     #[ListColumn]
     #[ORM\Column(options: ['comment' => '请求pv'])]
-    private ?int $visitPv;
+    private int $visitPv;
 
     #[ListColumn]
     #[ORM\Column(options: ['comment' => '请求Uv'])]

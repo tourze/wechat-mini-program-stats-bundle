@@ -139,7 +139,6 @@ class UserPortraitDataTest extends TestCase
         
         $result = $this->userPortraitData->retrieveAdminArray();
         
-        $this->assertIsArray($result);
         $this->assertArrayHasKey('date', $result);
         $this->assertArrayHasKey('type', $result);
         $this->assertArrayHasKey('name', $result);

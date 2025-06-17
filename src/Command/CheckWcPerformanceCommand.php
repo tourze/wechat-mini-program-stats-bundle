@@ -66,8 +66,8 @@ class CheckWcPerformanceCommand extends Command
     {
         $request = new WechatPerformanceRequest();
         $request->setAccount($account);
-        $request->setStartTimestamp($startTime);
-        $request->setEndTimestamp($endTime);
+        $request->setStartTimestamp((string) $startTime);
+        $request->setEndTimestamp((string) $endTime);
 
         $request->setModule($module->value);
         $params = [

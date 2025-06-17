@@ -41,8 +41,8 @@ class GetWechatMiniProgramVisitTotalUser extends CacheableProcedure
 
         return [
             'total' => $row[0]->getVisitTotal(),
-            'totalCompare' => round(($row[0]->getVisitTotal() - $row[1]->getVisitTotal()) / $row[1]->getVisitTotal(), 4),
-            'totalSevenCompare' => round(($row[0]->getVisitTotal() - $row[7]->getVisitTotal()) / $row[7]->getVisitTotal(), 4),
+            'totalCompare' => $row[1]->getVisitTotal() ? round(((int) $row[0]->getVisitTotal() - (int) $row[1]->getVisitTotal()) / (int) $row[1]->getVisitTotal(), 4) : 0,
+            'totalSevenCompare' => $row[7]->getVisitTotal() ? round(((int) $row[0]->getVisitTotal() - (int) $row[7]->getVisitTotal()) / (int) $row[7]->getVisitTotal(), 4) : 0,
         ];
     }
 

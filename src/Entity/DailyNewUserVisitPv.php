@@ -5,9 +5,8 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
@@ -23,6 +22,8 @@ use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
 #[ORM\UniqueConstraint(name: 'wechat_daily_new_user_visit_pv_idx_uniq', columns: ['date', 'account_id'])]
 class DailyNewUserVisitPv implements AdminArrayInterface
 {
+    use CreateTimeAware;
+
     #[ExportColumn]
     #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
@@ -30,13 +31,6 @@ class DailyNewUserVisitPv implements AdminArrayInterface
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
-
-    #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
 
     #[Filterable]
     #[ListColumn]
@@ -49,7 +43,7 @@ class DailyNewUserVisitPv implements AdminArrayInterface
 
     #[ListColumn]
     #[ORM\Column(nullable: true, options: ['comment' => 'uv'])]
-    private ?int $visitUv = 0;
+    private int $visitUv = 0;
 
     #[ListColumn]
     #[ORM\Column(length: 255, nullable: true)]
@@ -61,18 +55,6 @@ class DailyNewUserVisitPv implements AdminArrayInterface
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): self
-    {
-        $this->createTime = $createdAt;
-
-        return $this;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
     }
 
     public function getRemark(): ?string

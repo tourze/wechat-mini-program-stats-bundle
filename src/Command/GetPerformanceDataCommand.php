@@ -306,7 +306,7 @@ class GetPerformanceDataCommand extends LockableCommand
                             $dataRow->setNetworkType($networkType);
                             $dataRow->setDeviceLevel($paramsValue['device_level']['value']);
                             $dataRow->setMetricsId($tableValue['id']);
-                            $dataRow->setModule($moduleValue);
+                            $dataRow->setModule((string) $moduleValue);
                             $dataRow->setValue($tableValue['lines'][0]['fields'][$key]['value']);
                             $this->entityManager->persist($dataRow);
                             $this->entityManager->flush();
