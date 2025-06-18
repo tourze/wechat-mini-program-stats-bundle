@@ -7,7 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
+use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
+use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
@@ -21,8 +22,6 @@ use WechatMiniProgramStatsBundle\Repository\PerformanceAttributeRepository;
 #[ORM\Table(name: 'wechat_mini_program_performance_attribute', options: ['comment' => '微信小程序性能属性表'])]
 class PerformanceAttribute implements AdminArrayInterface
 {
-    use CreateTimeAware;
-
     #[ListColumn(order: -1)]
     #[ExportColumn]
     #[ORM\Id]
@@ -34,6 +33,13 @@ class PerformanceAttribute implements AdminArrayInterface
     {
         return $this->id;
     }
+
+    #[IndexColumn]
+    #[ListColumn(order: 98, sorter: true)]
+    #[ExportColumn]
+    #[CreateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
+    private ?\DateTimeInterface $createTime = null;
 
     #[Groups(['admin_curd'])]
     #[Keyword]
@@ -51,7 +57,20 @@ class PerformanceAttribute implements AdminArrayInterface
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'wechatPerformanceAttributes')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Performance $performance;
-public function retrieveAdminArray(): array
+
+    public function setCreateTime(?\DateTimeInterface $createdAt): self
+    {
+        $this->createTime = $createdAt;
+
+        return $this;
+    }
+
+    public function getCreateTime(): ?\DateTimeInterface
+    {
+        return $this->createTime;
+    }
+
+    public function retrieveAdminArray(): array
     {
         return [
             'id' => $this->getId(),
@@ -91,7 +110,7 @@ public function retrieveAdminArray(): array
         return $this->performance;
     }
 
-    public function setPerformance(?Performance $performance): static
+    public function setPerformance(Performance $performance): static
     {
         $this->performance = $performance;
 

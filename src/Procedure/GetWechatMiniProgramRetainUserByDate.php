@@ -82,10 +82,10 @@ class GetWechatMiniProgramRetainUserByDate extends CacheableProcedure
 
         return [
             ...$res,
-            'visitUvCompare' => $beforeVisitUv && $beforeVisitUv->getUserNumber() ? round(($res['visitUv'] - (int) $beforeVisitUv->getUserNumber()) / (int) $beforeVisitUv->getUserNumber(), 4) : null,
-            'visitUvNewCompare' => $beforeVisitUvNew && $beforeVisitUvNew->getUserNumber() ? round(($res['visitUvNew'] - (int) $beforeVisitUvNew->getUserNumber()) / (int) $beforeVisitUvNew->getUserNumber(), 4) : null,
-            'visitUvSevenCompare' => $beforeSevenVisitUv && $beforeSevenVisitUv->getUserNumber() ? round(($res['visitUv'] - (int) $beforeSevenVisitUv->getUserNumber()) / (int) $beforeSevenVisitUv->getUserNumber(), 4) : null,
-            'visitUvNewSevenCompare' => $beforeSevenVisitUvNew && $beforeSevenVisitUvNew->getUserNumber() ? round(($res['visitUvNew'] - (int) $beforeSevenVisitUvNew->getUserNumber()) / (int) $beforeSevenVisitUvNew->getUserNumber(), 4) : null,
+            'visitUvCompare' => $beforeVisitUv ? round(($res['visitUv'] - $beforeVisitUv->getUserNumber()) / $beforeVisitUv->getUserNumber(), 4) : null,
+            'visitUvNewCompare' => $beforeVisitUvNew ? round(($res['visitUvNew'] - $beforeVisitUvNew->getUserNumber()) / $beforeVisitUvNew->getUserNumber(), 4) : null,
+            'visitUvSevenCompare' => $beforeSevenVisitUv ? round(($res['visitUv'] - $beforeSevenVisitUv->getUserNumber()) / $beforeSevenVisitUv->getUserNumber(), 4) : null,
+            'visitUvNewSevenCompare' => $beforeSevenVisitUvNew ? round(($res['visitUvNew'] - $beforeSevenVisitUvNew->getUserNumber()) / $beforeSevenVisitUvNew->getUserNumber(), 4) : null,
         ];
     }
 

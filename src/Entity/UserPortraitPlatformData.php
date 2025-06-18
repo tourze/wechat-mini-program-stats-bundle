@@ -5,8 +5,9 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
+use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
+use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
 use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
@@ -23,8 +24,6 @@ use WechatMiniProgramStatsBundle\Repository\UserPortraitPlatformDataRepository;
 #[ORM\UniqueConstraint(name: 'wechat_user_access_portrait_platform_data_uniq', columns: ['date', 'type', 'account_id', 'name'])]
 class UserPortraitPlatformData implements AdminArrayInterface
 {
-    use CreateTimeAware;
-
     #[ExportColumn]
     #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
@@ -32,6 +31,13 @@ class UserPortraitPlatformData implements AdminArrayInterface
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
+
+    #[IndexColumn]
+    #[ListColumn(order: 98, sorter: true)]
+    #[ExportColumn]
+    #[CreateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
+    private ?\DateTimeInterface $createTime = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
@@ -60,6 +66,18 @@ class UserPortraitPlatformData implements AdminArrayInterface
     public function getId(): ?string
     {
         return $this->id;
+    }
+
+    public function setCreateTime(?\DateTimeInterface $createdAt): self
+    {
+        $this->createTime = $createdAt;
+
+        return $this;
+    }
+
+    public function getCreateTime(): ?\DateTimeInterface
+    {
+        return $this->createTime;
     }
 
     public function getValueId(): ?string

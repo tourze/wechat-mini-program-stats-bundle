@@ -50,7 +50,7 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
             ->select('sum(t.visitUv)')
             ->where('t.account = :account and t.date between :start and :end')
             ->setParameter('account', $account)
-            ->setParameter('start', Carbon::now()->subDays((int) $this->day))
+            ->setParameter('start', Carbon::now()->subDays($this->day))
             ->setParameter('end', Carbon::now()->startOfDay())
             ->getQuery()
             ->getSingleScalarResult();
@@ -59,7 +59,7 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
             ->select('sum(t.visitPv)')
             ->where('t.account = :account and t.date between :start and :end')
             ->setParameter('account', $account)
-            ->setParameter('start', Carbon::now()->subDays((int) $this->day))
+            ->setParameter('start', Carbon::now()->subDays($this->day))
             ->setParameter('end', Carbon::now()->startOfDay())
             ->getQuery()
             ->getSingleScalarResult();

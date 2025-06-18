@@ -123,6 +123,7 @@ class UserPortraitProvinceDataTest extends TestCase
         $result = $this->data->retrieveAdminArray();
         
         // Assert
+        $this->assertIsArray($result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('date', $result);
         $this->assertArrayHasKey('type', $result);

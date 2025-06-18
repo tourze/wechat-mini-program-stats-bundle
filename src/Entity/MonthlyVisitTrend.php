@@ -5,7 +5,8 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
+use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
+use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
@@ -18,8 +19,6 @@ use WechatMiniProgramStatsBundle\Repository\MonthlyVisitTrendRepository;
 #[ORM\UniqueConstraint(name: 'wechat_mini_program_monthly_visit_trend_idx_uniq', columns: ['account_id', 'begin_date', 'end_date'])]
 class MonthlyVisitTrend implements AdminArrayInterface
 {
-    use CreateTimeAware;
-
     #[ListColumn(order: -1)]
     #[ExportColumn]
     #[ORM\Id]
@@ -31,6 +30,13 @@ class MonthlyVisitTrend implements AdminArrayInterface
     {
         return $this->id;
     }
+
+    #[IndexColumn]
+    #[ListColumn(order: 98, sorter: true)]
+    #[ExportColumn]
+    #[CreateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
+    private ?\DateTimeInterface $createTime = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
@@ -77,7 +83,20 @@ class MonthlyVisitTrend implements AdminArrayInterface
     #[ListColumn]
     #[ORM\Column(length: 200, options: ['comment' => '平均访问深度 (浮点型)'])]
     private ?string $visitDepth = null;
-public function getAccount(): ?Account
+
+    public function setCreateTime(?\DateTimeInterface $createdAt): self
+    {
+        $this->createTime = $createdAt;
+
+        return $this;
+    }
+
+    public function getCreateTime(): ?\DateTimeInterface
+    {
+        return $this->createTime;
+    }
+
+    public function getAccount(): ?Account
     {
         return $this->account;
     }
