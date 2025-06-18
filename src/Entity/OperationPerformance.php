@@ -5,8 +5,7 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
@@ -22,6 +21,8 @@ use WechatMiniProgramStatsBundle\Repository\OperationPerformanceRepository;
 #[ORM\UniqueConstraint(name: 'wechat_mini_program_operation_performance_uniq', columns: ['account_id', 'date', 'cost_time_type'])]
 class OperationPerformance implements AdminArrayInterface
 {
+    use CreateTimeAware;
+
     #[ListColumn(order: -1)]
     #[ExportColumn]
     #[ORM\Id]
@@ -33,13 +34,6 @@ class OperationPerformance implements AdminArrayInterface
     {
         return $this->id;
     }
-
-    #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
 
     #[ListColumn]
     #[ORM\ManyToOne]
@@ -59,20 +53,7 @@ class OperationPerformance implements AdminArrayInterface
     #[ListColumn]
     #[ORM\Column]
     private ?string $costTime = null;
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): self
-    {
-        $this->createTime = $createdAt;
-
-        return $this;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
-    }
-
-    public function getDate(): ?\DateTimeInterface
+public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }

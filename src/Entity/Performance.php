@@ -7,8 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
@@ -25,6 +24,8 @@ use WechatMiniProgramStatsBundle\Repository\PerformanceRepository;
 #[ORM\Table(name: 'wechat_mini_program_performance', options: ['comment' => '微信小程序性能'])]
 class Performance implements AdminArrayInterface
 {
+    use CreateTimeAware;
+
     #[ListColumn(order: -1)]
     #[ExportColumn]
     #[ORM\Id]
@@ -36,13 +37,6 @@ class Performance implements AdminArrayInterface
     {
         return $this->id;
     }
-
-    #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
 
     #[ListColumn]
     #[ORM\ManyToOne]
@@ -70,18 +64,6 @@ class Performance implements AdminArrayInterface
     public function __construct()
     {
         $this->wechatPerformanceAttributes = new ArrayCollection();
-    }
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): self
-    {
-        $this->createTime = $createdAt;
-
-        return $this;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
     }
 
     public function retrieveAdminArray(): array

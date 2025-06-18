@@ -5,9 +5,8 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
@@ -24,6 +23,8 @@ use WechatMiniProgramStatsBundle\Repository\AccessSourceSessionCntRepository;
 #[ORM\UniqueConstraint(name: 'wechat_access_source_session_cnt_uniq', columns: ['date', 'account_id', 'data_key'])]
 class AccessSourceSessionCnt implements AdminArrayInterface
 {
+    use CreateTimeAware;
+
     #[ExportColumn]
     #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
@@ -31,13 +32,6 @@ class AccessSourceSessionCnt implements AdminArrayInterface
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
-
-    #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
 
     #[ListColumn]
     #[ORM\Column(name: 'date', type: Types::DATE_MUTABLE, nullable: false, options: ['comment' => '数据日期'])]
@@ -58,18 +52,6 @@ class AccessSourceSessionCnt implements AdminArrayInterface
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): self
-    {
-        $this->createTime = $createdAt;
-
-        return $this;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
     }
 
     public function getDataValue(): ?string

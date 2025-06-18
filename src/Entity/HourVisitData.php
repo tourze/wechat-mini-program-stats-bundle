@@ -71,12 +71,12 @@ class HourVisitData implements AdminArrayInterface
         return $this->id;
     }
 
-    public function getVisitUserUv(): ?string
+    public function getVisitUserUv(): ?int
     {
         return $this->visitUserUv;
     }
 
-    public function setVisitUserUv(?string $visitUserUv): void
+    public function setVisitUserUv(?int $visitUserUv): void
     {
         $this->visitUserUv = $visitUserUv;
     }
