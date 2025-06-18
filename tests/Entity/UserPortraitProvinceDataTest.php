@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Tests\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitProvinceData;
@@ -23,11 +23,11 @@ class UserPortraitProvinceDataTest extends TestCase
 
     public function testCreateTime_getterAndSetter(): void
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         $this->assertNull($this->data->getCreateTime());
-        
+
         $result = $this->data->setCreateTime($now);
-        
+
         $this->assertSame($now, $this->data->getCreateTime());
         $this->assertSame($this->data, $result, 'Setter should return self for method chaining');
     }
@@ -36,9 +36,9 @@ class UserPortraitProvinceDataTest extends TestCase
     {
         $date = '20230101-20230107';
         $this->assertNull($this->data->getDate());
-        
+
         $result = $this->data->setDate($date);
-        
+
         $this->assertSame($date, $this->data->getDate());
         $this->assertSame($this->data, $result, 'Setter should return self for method chaining');
     }
@@ -47,9 +47,9 @@ class UserPortraitProvinceDataTest extends TestCase
     {
         $type = 'visit_uv_new';
         $this->assertNull($this->data->getType());
-        
+
         $this->data->setType($type);
-        
+
         $this->assertSame($type, $this->data->getType());
     }
 
@@ -57,9 +57,9 @@ class UserPortraitProvinceDataTest extends TestCase
     {
         $name = 'Beijing';
         $this->assertNull($this->data->getName());
-        
+
         $this->data->setName($name);
-        
+
         $this->assertSame($name, $this->data->getName());
     }
 
@@ -67,9 +67,9 @@ class UserPortraitProvinceDataTest extends TestCase
     {
         $value = '100';
         $this->assertNull($this->data->getValue());
-        
+
         $this->data->setValue($value);
-        
+
         $this->assertSame($value, $this->data->getValue());
     }
 
@@ -77,9 +77,9 @@ class UserPortraitProvinceDataTest extends TestCase
     {
         $valueId = '110000';
         $this->assertNull($this->data->getValueId());
-        
+
         $this->data->setValueId($valueId);
-        
+
         $this->assertSame($valueId, $this->data->getValueId());
     }
 
@@ -87,9 +87,9 @@ class UserPortraitProvinceDataTest extends TestCase
     {
         $account = $this->createMock(Account::class);
         $this->assertNull($this->data->getAccount());
-        
+
         $result = $this->data->setAccount($account);
-        
+
         $this->assertSame($account, $this->data->getAccount());
         $this->assertSame($this->data, $result, 'Setter should return self for method chaining');
     }
@@ -104,13 +104,13 @@ class UserPortraitProvinceDataTest extends TestCase
         $value = '100';
         $valueId = '110000';
         $account = $this->createMock(Account::class);
-        $createTime = new DateTime();
-        
+        $createTime = new DateTimeImmutable();
+
         // 使用反射设置私有 ID 属性
         $reflection = new \ReflectionProperty(UserPortraitProvinceData::class, 'id');
         $reflection->setAccessible(true);
         $reflection->setValue($this->data, $id);
-        
+
         $this->data->setDate($date);
         $this->data->setType($type);
         $this->data->setName($name);
@@ -118,12 +118,11 @@ class UserPortraitProvinceDataTest extends TestCase
         $this->data->setValueId($valueId);
         $this->data->setAccount($account);
         $this->data->setCreateTime($createTime);
-        
+
         // Act
         $result = $this->data->retrieveAdminArray();
-        
+
         // Assert
-        $this->assertIsArray($result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('date', $result);
         $this->assertArrayHasKey('type', $result);
@@ -132,7 +131,7 @@ class UserPortraitProvinceDataTest extends TestCase
         $this->assertArrayHasKey('valueId', $result);
         $this->assertArrayHasKey('account', $result);
         $this->assertArrayHasKey('createTime', $result);
-        
+
         $this->assertEquals($id, $result['id']);
         $this->assertEquals($date, $result['date']);
         $this->assertEquals($type, $result['type']);
@@ -142,4 +141,4 @@ class UserPortraitProvinceDataTest extends TestCase
         $this->assertEquals($account, $result['account']);
         $this->assertEquals($createTime, $result['createTime']);
     }
-} 
+}

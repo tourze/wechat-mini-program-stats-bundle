@@ -40,7 +40,7 @@ class CountDailyPageVisitDataCommand extends LockableCommand
                 'date' => $start,
                 'page' => $item['page'],
             ]);
-            if (empty($log)) {
+            if ((bool) empty($log)) {
                 $log = new DailyPageVisitData();
                 $log->setDate($start);
                 $log->setPage($item['page']);

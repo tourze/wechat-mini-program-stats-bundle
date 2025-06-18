@@ -52,7 +52,7 @@ class GetUserAccessesWeekDataCommand extends LockableCommand
                 ]);
                 continue;
             }
-            if (isset($res['visit_uv_new'])) {
+            if ((bool) isset($res['visit_uv_new'])) {
                 foreach ($res['visit_uv_new'] as $value) {
                     $userAccessesWeekData = $this->userAccessesWeekDataRepository->findOneBy([
                         'date' => $res['ref_date'],
@@ -72,7 +72,7 @@ class GetUserAccessesWeekDataCommand extends LockableCommand
                 }
             }
 
-            if (isset($res['visit_uv'])) {
+            if ((bool) isset($res['visit_uv'])) {
                 foreach ($res['visit_uv'] as $value) {
                     $userAccessesWeekData = $this->userAccessesWeekDataRepository->findOneBy([
                         'date' => $res['ref_date'],

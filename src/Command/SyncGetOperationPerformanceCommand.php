@@ -25,7 +25,9 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetOperationPerformanceRequest
 #[AsCommand(name: 'wechat:official-account:SyncGetOperationPerformanceCommand', description: '运维中心-查询性能数据')]
 class SyncGetOperationPerformanceCommand extends Command
 {
-    public function __construct(
+    
+    public const NAME = 'wechat:official-account:SyncGetOperationPerformanceCommand';
+public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly Client $client,
         private readonly OperationPerformanceRepository $operationPerformanceRepository,

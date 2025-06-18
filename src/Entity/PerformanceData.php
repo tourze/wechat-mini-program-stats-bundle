@@ -7,17 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\PerformanceDataRepository;
 
-#[AsPermission(title: '获取小程序性能数据')]
 #[Listable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: PerformanceDataRepository::class)]
 #[ORM\Table(name: 'wechat_performance_data', options: ['comment' => '获取小程序性能数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'account_id', 'description'])]
@@ -25,40 +19,24 @@ class PerformanceData implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => 'module编码'])]
     private ?string $module = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '网络类型'])]
     private ?string $networkType = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '机型'])]
     private ?string $deviceLevel = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '性能数据指标id'])]
     private ?string $metricsId = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '说明'])]
     private ?string $description = null;
 
-    #[ListColumn]
-    #[ORM\Column(name: 'date', type: Types::DATE_MUTABLE, nullable: false, options: ['comment' => '数据日期'])]
     private ?\DateTimeInterface $date = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '值'])]
     private ?string $value = null;
 
     #[ORM\ManyToOne]

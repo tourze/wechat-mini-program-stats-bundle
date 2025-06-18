@@ -9,13 +9,8 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Filter\Keyword;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramStatsBundle\Repository\PerformanceAttributeRepository;
 
-#[AsPermission(title: '微信小程序性能属性表')]
 #[Listable]
 #[ORM\Entity(repositoryClass: PerformanceAttributeRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_performance_attribute', options: ['comment' => '微信小程序性能属性表'])]
@@ -23,8 +18,6 @@ class PerformanceAttribute implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ListColumn(order: -1)]
-    #[ExportColumn]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -36,15 +29,9 @@ class PerformanceAttribute implements AdminArrayInterface
     }
 
     #[Groups(['admin_curd'])]
-    #[Keyword]
-    #[ListColumn]
-    #[ORM\Column(type: Types::STRING, length: 32, options: ['comment' => '名称'])]
     private ?string $name = null;
 
     #[Groups(['admin_curd'])]
-    #[Keyword]
-    #[ListColumn]
-    #[ORM\Column(type: Types::STRING, length: 64, options: ['comment' => '内容'])]
     private ?string $value = null;
 
     #[Ignore]

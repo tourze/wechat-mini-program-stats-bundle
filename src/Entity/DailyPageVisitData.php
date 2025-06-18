@@ -7,20 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\EasyAdmin\Attribute\Action\Exportable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramStatsBundle\Repository\DailyPageVisitDataRepository;
 
-#[AsPermission(title: '每日页面请求汇总日志')]
 #[Exportable]
 #[ORM\Entity(repositoryClass: DailyPageVisitDataRepository::class)]
 #[ORM\Table(name: 'wechat_daily_page_visit_data', options: ['comment' => '每日页面请求汇总日志'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_page_visit_data_idx_uniq', columns: ['date', 'page'])]
 class DailyPageVisitData implements AdminArrayInterface
 {
-    #[ListColumn(order: -1)]
-    #[ExportColumn]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -31,27 +25,17 @@ class DailyPageVisitData implements AdminArrayInterface
         return $this->id;
     }
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['comment' => '日期'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '日期'])]
     private ?\DateTimeInterface $date = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 255, options: ['comment' => '页面路径'])]
     private string $page;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '请求pv'])]
     private int $visitPv;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '请求Uv'])]
     private ?int $visitUv;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '新用户请求pv'])]
     private ?int $newUserVisitPv;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '新用户请求Uv'])]
     private ?int $newUserVisitUv;
 
     use TimestampableAware;

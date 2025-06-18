@@ -9,16 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Filter\Filterable;
-use Tourze\EasyAdmin\Attribute\Filter\Keyword;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Enum\PerformanceModule;
 use WechatMiniProgramStatsBundle\Repository\PerformanceRepository;
 
-#[AsPermission(title: '微信小程序性能')]
 #[Listable]
 #[ORM\Entity(repositoryClass: PerformanceRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_performance', options: ['comment' => '微信小程序性能'])]
@@ -26,8 +20,6 @@ class Performance implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ListColumn(order: -1)]
-    #[ExportColumn]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -38,24 +30,14 @@ class Performance implements AdminArrayInterface
         return $this->id;
     }
 
-    #[ListColumn]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-    #[Filterable]
-    #[ListColumn]
-    #[ORM\Column(type: Types::STRING, length: 255, enumType: PerformanceModule::class, options: ['comment' => '性能指标'])]
     private ?PerformanceModule $module = null;
 
-    #[Keyword]
-    #[ListColumn]
-    #[ORM\Column(type: Types::STRING, length: 32, options: ['comment' => '名称'])]
     private ?string $name = null;
 
-    #[Keyword]
-    #[ListColumn]
-    #[ORM\Column(type: Types::STRING, length: 64, options: ['comment' => '中文含义'])]
     private ?string $nameZh = null;
 
     #[ORM\OneToMany(mappedBy: 'performance', targetEntity: PerformanceAttribute::class)]

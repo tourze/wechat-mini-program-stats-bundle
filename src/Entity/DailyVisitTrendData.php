@@ -8,17 +8,11 @@ use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\Arrayable\ApiArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 
-#[AsPermission(title: '获取用户访问小程序数据日趋势')]
 #[Listable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: DailyVisitTrendDataRepository::class)]
 #[ORM\Table(name: 'wechat_daily_visit_trend_data', options: ['comment' => '获取用户访问小程序数据日趋势'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'account_id'])]
@@ -26,44 +20,26 @@ class DailyVisitTrendData implements ApiArrayInterface, AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[ListColumn]
-    #[ORM\Column(name: 'date', type: Types::DATE_MUTABLE, nullable: false, options: ['comment' => '数据日期'])]
     private ?\DateTimeInterface $date = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '打开次数'])]
     private ?int $sessionCnt = 0;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '访问次数'])]
     private ?int $visitPv = 0;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '访问人数'])]
     private ?int $visitUv = 0;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '新用户数'])]
     private ?int $visitUvNew = 0;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '人均停留时长 (浮点型，单位：秒)'])]
     private ?string $stayTimeUv = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '次均停留时长 (浮点型，单位：秒)'])]
     private ?string $stayTimeSession = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '平均访问深度 (浮点型)'])]
     private ?string $visitDepth = null;
 
     #[ORM\ManyToOne]

@@ -8,14 +8,9 @@ use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Filter\Filterable;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\HourVisitDataRepository;
 
-#[AsPermission(title: '小程序每小时访问数据')]
 #[Listable]
 #[ORM\Entity(repositoryClass: HourVisitDataRepository::class)]
 #[ORM\Table(name: 'wechat_hour_visit_data', options: ['comment' => '小程序每小时访问数据'])]
@@ -24,44 +19,26 @@ class HourVisitData implements AdminArrayInterface
 {
     use TimestampableAware;
 
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[Filterable]
-    #[ListColumn]
-    #[ORM\Column(name: 'date', type: Types::DATETIME_MUTABLE, nullable: false, options: ['comment' => '日期，YmdH'])]
     private \DateTimeInterface $date;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '访问人数'])]
     private ?int $visitUserUv = 0;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '打开次数'])]
     private ?int $visitUserPv = 0;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '访问页面数'])]
     private ?int $pagePv = 0;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '新增用户'])]
     private ?int $newUser = 0;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '新用户打开次数'])]
     private ?int $visitNewUserPv = 0;
 
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '新用户访问页面数'])]
     private ?int $pageNewUserPv = 0;
 
-    #[ListColumn]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;

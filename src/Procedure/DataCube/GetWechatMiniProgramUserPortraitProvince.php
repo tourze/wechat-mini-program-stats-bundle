@@ -60,7 +60,7 @@ class GetWechatMiniProgramUserPortraitProvince extends CacheableProcedure
             'date' => $date,
             'type' => 'visit_uv',
         ]);
-        if (empty($row)) {
+        if ((bool) empty($row)) {
             $this->service->getDate($account, $start, $end);
         }
 

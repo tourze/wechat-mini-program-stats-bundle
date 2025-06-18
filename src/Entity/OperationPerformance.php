@@ -7,14 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Filter\Keyword;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\OperationPerformanceRepository;
 
-#[AsPermission(title: '运维中心-查询性能数据')]
 #[Listable]
 #[ORM\Entity(repositoryClass: OperationPerformanceRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_operation_performance', options: ['comment' => '运维中心-查询性能数据'])]
@@ -23,8 +18,6 @@ class OperationPerformance implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ListColumn(order: -1)]
-    #[ExportColumn]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -35,23 +28,14 @@ class OperationPerformance implements AdminArrayInterface
         return $this->id;
     }
 
-    #[ListColumn]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-    #[ListColumn]
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    #[Keyword]
-    #[ListColumn]
-    #[ORM\Column]
     private ?string $costTimeType = null;
 
-    #[Keyword]
-    #[ListColumn]
-    #[ORM\Column]
     private ?string $costTime = null;
 public function getDate(): ?\DateTimeInterface
     {

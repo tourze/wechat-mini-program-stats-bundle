@@ -52,7 +52,7 @@ class WechatUserPortraitService
 
             return;
         }
-        if (isset($res['visit_uv_new'])) {
+        if ((bool) isset($res['visit_uv_new'])) {
             foreach ($res['visit_uv_new']['province'] as $provinceValue) {
                 $provinceData = $this->provinceRepository->findOneBy([
                     'date' => $res['ref_date'],
@@ -68,7 +68,7 @@ class WechatUserPortraitService
                     $provinceData->setName($provinceValue['name']);
                 }
                 $valueId = '';
-                if (isset($provinceValue['id'])) {
+                if ((bool) isset($provinceValue['id'])) {
                     $valueId = $provinceValue['id'];
                 }
                 $provinceData->setValueId($valueId);
@@ -93,7 +93,7 @@ class WechatUserPortraitService
                     $cityData->setDate($res['ref_date']);
                 }
                 $valueId = '';
-                if (isset($cityValue['id'])) {
+                if ((bool) isset($cityValue['id'])) {
                     $valueId = $cityValue['id'];
                 }
                 $cityData->setValueId($valueId);
@@ -118,7 +118,7 @@ class WechatUserPortraitService
                     $genderData->setName($genderValue['name']);
                 }
                 $valueId = '';
-                if (isset($genderValue['id'])) {
+                if ((bool) isset($genderValue['id'])) {
                     $valueId = $genderValue['id'];
                 }
                 $genderData->setValueId($valueId);
@@ -143,7 +143,7 @@ class WechatUserPortraitService
                     $platformData->setName($platformValue['name']);
                 }
                 $valueId = '';
-                if (isset($platformValue['id'])) {
+                if ((bool) isset($platformValue['id'])) {
                     $valueId = $platformValue['id'];
                 }
                 $platformData->setValueId($valueId);
@@ -168,7 +168,7 @@ class WechatUserPortraitService
                     $deviceData->setName($deviceValue['name']);
                 }
                 $valueId = '';
-                if (isset($deviceValue['id'])) {
+                if ((bool) isset($deviceValue['id'])) {
                     $valueId = $deviceValue['id'];
                 }
                 $deviceData->setValueId($valueId);
@@ -193,7 +193,7 @@ class WechatUserPortraitService
                     $ageData->setName($ageValue['name']);
                 }
                 $valueId = '';
-                if (isset($ageValue['id'])) {
+                if ((bool) isset($ageValue['id'])) {
                     $valueId = $ageValue['id'];
                 }
                 $ageData->setValueId($valueId);
@@ -203,7 +203,7 @@ class WechatUserPortraitService
                 $this->entityManager->detach($ageData);
             }
         }
-        if (isset($res['visit_uv'])) {
+        if ((bool) isset($res['visit_uv'])) {
             foreach ($res['visit_uv']['province'] as $provinceValue) {
                 $provinceData = $this->provinceRepository->findOneBy([
                     'date' => $res['ref_date'],
@@ -219,7 +219,7 @@ class WechatUserPortraitService
                     $provinceData->setName($provinceValue['name']);
                 }
                 $valueId = '';
-                if (isset($provinceValue['id'])) {
+                if ((bool) isset($provinceValue['id'])) {
                     $valueId = $provinceValue['id'];
                 }
                 $provinceData->setValueId($valueId);
@@ -244,7 +244,7 @@ class WechatUserPortraitService
                     $cityData->setName($cityValue['name']);
                 }
                 $valueId = '';
-                if (isset($cityValue['id'])) {
+                if ((bool) isset($cityValue['id'])) {
                     $valueId = $cityValue['id'];
                 }
                 $cityData->setValueId($valueId);
@@ -269,7 +269,7 @@ class WechatUserPortraitService
                     $genderData->setName($genderValue['name']);
                 }
                 $valueId = '';
-                if (isset($genderValue['id'])) {
+                if ((bool) isset($genderValue['id'])) {
                     $valueId = $genderValue['id'];
                 }
                 $genderData->setValueId($valueId);
@@ -294,7 +294,7 @@ class WechatUserPortraitService
                     $platformData->setName($platformValue['name']);
                 }
                 $valueId = '';
-                if (isset($platformValue['id'])) {
+                if ((bool) isset($platformValue['id'])) {
                     $valueId = $platformValue['id'];
                 }
                 $platformData->setValueId($valueId);
@@ -317,7 +317,7 @@ class WechatUserPortraitService
                     $deviceData->setDate($res['ref_date']);
                 }
                 $valueId = '';
-                if (isset($deviceValue['id'])) {
+                if ((bool) isset($deviceValue['id'])) {
                     $valueId = $deviceValue['id'];
                 }
                 $deviceData->setValueId($valueId);
@@ -343,7 +343,7 @@ class WechatUserPortraitService
                     $ageData->setName($ageValue['name']);
                 }
                 $valueId = '';
-                if (isset($ageValue['id'])) {
+                if ((bool) isset($ageValue['id'])) {
                     $valueId = $ageValue['id'];
                 }
                 $ageData->setValueId($valueId);

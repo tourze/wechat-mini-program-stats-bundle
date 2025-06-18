@@ -56,7 +56,7 @@ class GetDailyRetainCommand extends LockableCommand
                 ]);
                 continue;
             }
-            if (isset($res['visit_uv_new'])) {
+            if ((bool) isset($res['visit_uv_new'])) {
                 foreach ($res['visit_uv_new'] as $value) {
                     $log = $this->logRepository->findOneBy([
                         'date' => Carbon::parse($res['ref_date']),
@@ -75,7 +75,7 @@ class GetDailyRetainCommand extends LockableCommand
                 }
             }
 
-            if (isset($res['visit_uv'])) {
+            if ((bool) isset($res['visit_uv'])) {
                 foreach ($res['visit_uv'] as $value) {
                     $log = $this->logRepository->findOneBy([
                         'date' => Carbon::parse($res['ref_date']),

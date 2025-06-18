@@ -89,7 +89,7 @@ class CountWechatHourVisitDataCommand extends LockableCommand
 //            'account' => $account,
 //            'date' => $start,
 //        ]);
-//        if (empty($entity)) {
+//        if ((bool) empty($entity)) {
 //            $entity = new HourVisitData();
 //            $entity->setAccount($account);
 //            $entity->setDate($start);

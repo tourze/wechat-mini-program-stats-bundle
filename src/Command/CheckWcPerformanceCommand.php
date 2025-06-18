@@ -25,7 +25,9 @@ use WechatMiniProgramStatsBundle\Request\DataAnalysis\WechatPerformanceRequest;
 #[AsCommand(name: 'wechat-mini-program:check-performance', description: '定期查询小程序性能指标')]
 class CheckWcPerformanceCommand extends Command
 {
-    public function __construct(
+    
+    public const NAME = 'wechat-mini-program:check-performance';
+public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly Client $client,
         private readonly PerformanceRepository $performanceRepository,

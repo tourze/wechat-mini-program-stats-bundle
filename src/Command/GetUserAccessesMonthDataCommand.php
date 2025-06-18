@@ -53,7 +53,7 @@ class GetUserAccessesMonthDataCommand extends LockableCommand
                 ]);
                 continue;
             }
-            if (isset($res['visit_uv_new'])) {
+            if ((bool) isset($res['visit_uv_new'])) {
                 foreach ($res['visit_uv_new'] as $value) {
                     $userAccessesMonthData = $this->userAccessesMonthDataRepository->findOneBy([
                         'date' => $res['ref_date'],
@@ -73,7 +73,7 @@ class GetUserAccessesMonthDataCommand extends LockableCommand
                 }
             }
 
-            if (isset($res['visit_uv'])) {
+            if ((bool) isset($res['visit_uv'])) {
                 foreach ($res['visit_uv'] as $value) {
                     $userAccessesMonthData = $this->userAccessesMonthDataRepository->findOneBy([
                         'date' => $res['ref_date'],

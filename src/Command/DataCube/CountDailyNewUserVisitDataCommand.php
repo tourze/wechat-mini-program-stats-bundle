@@ -43,7 +43,7 @@ class CountDailyNewUserVisitDataCommand extends LockableCommand
                 'account' => $account,
                 'date' => $start,
             ]);
-            if (empty($log)) {
+            if ((bool) empty($log)) {
                 $log = new DailyNewUserVisitPv();
                 $log->setAccount($account);
                 $log->setDate($start);

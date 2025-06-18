@@ -300,7 +300,7 @@ class GetPerformanceDataCommand extends LockableCommand
                                 $dataRow->setDate(Carbon::parse($tableValue['lines'][0]['fields'][$key]['refdate']));
                             }
                             $networkType = '';
-                            if (isset($paramsValue['networktype'])) {
+                            if ((bool) isset($paramsValue['networktype'])) {
                                 $networkType = $paramsValue['networktype']['value'];
                             }
                             $dataRow->setNetworkType($networkType);

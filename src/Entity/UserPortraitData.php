@@ -7,17 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitDataRepository;
 
-#[AsPermission(title: '用户画像分布数据')]
 #[Listable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: UserPortraitDataRepository::class)]
 #[ORM\Table(name: 'wechat_user_access_portrait_data', options: ['comment' => '用户画像分布数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_user_access_portrait_data_uniq', columns: ['date', 'name', 'account_id', 'type'])]
@@ -25,8 +19,6 @@ class UserPortraitData implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -37,59 +29,38 @@ class UserPortraitData implements AdminArrayInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-    #[ListColumn]
-    #[ORM\Column(name: 'date', type: Types::STRING, nullable: true, options: ['comment' => '数据日期'])]
     private ?string $date = null;
 
-    #[ListColumn]
-    #[ORM\Column]
     private ?string $type = null;
 
-    #[ListColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '开始时间'])]
     private ?\DateTimeInterface $beginTime = null;
 
-    #[ListColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '结束时间'])]
     private ?\DateTimeInterface $endTime = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '用户类型'])]
     private ?string $userType = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '分布类型'])]
     private ?string $province = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '属性名'])]
     private ?string $name = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '属性值'])]
     private ?string $value = null;
 
     public function getId(): ?string
     {
         return $this->id;
-    }//    #[ListColumn]
-    //    #[ORM\Column(length: 100, options: ['comment' => '省份'])]
+    }//    //    #[ORM\Column(length: 100, options: ['comment' => '省份'])]
     //    private ?string $city = null;
     //
-    //    #[ListColumn]
-    //    #[ORM\Column(length: 100, options: ['comment' => '城市'])]
+    //    //    #[ORM\Column(length: 100, options: ['comment' => '城市'])]
     //    private ?string $genders = null;
     //
-    //    #[ListColumn]
-    //    #[ORM\Column(length: 100, options: ['comment' => '性别'])]
+    //    //    #[ORM\Column(length: 100, options: ['comment' => '性别'])]
     //    private ?string $platforms = null;
     //
-    //    #[ListColumn]
-    //    #[ORM\Column(length: 100, options: ['comment' => '终端类型'])]
+    //    //    #[ORM\Column(length: 100, options: ['comment' => '终端类型'])]
     //    private ?string $devices = null;
     //
-    //    #[ListColumn]
-    //    #[ORM\Column(length: 100, options: ['comment' => '年龄'])]
+    //    //    #[ORM\Column(length: 100, options: ['comment' => '年龄'])]
     //    private ?string $ages = null;
 
     //    public function setAges(?string $ages): void

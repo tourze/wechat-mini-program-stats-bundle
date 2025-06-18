@@ -8,14 +8,9 @@ use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Filter\Filterable;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
 
-#[AsPermission(title: '新用户访问小程序次数')]
 #[Listable]
 #[ORM\Entity(repositoryClass: DailyNewUserVisitPvRepository::class)]
 #[ORM\Table(name: 'wechat_daily_new_user_visit_pv', options: ['comment' => '新用户访问小程序次数'])]
@@ -24,29 +19,18 @@ class DailyNewUserVisitPv implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[Filterable]
-    #[ListColumn]
-    #[ORM\Column(name: 'date', type: Types::DATE_MUTABLE, nullable: false, options: ['comment' => '数据日期'])]
     private \DateTimeInterface $date;
 
-    #[ListColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => 'pv'])]
     private ?int $visitPv = 0;
 
-    #[ListColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => 'uv'])]
     private int $visitUv = 0;
 
-    #[ListColumn]
-    #[ORM\Column(length: 255, nullable: true)]
     private ?string $remark = null;
 
     #[ORM\ManyToOne]

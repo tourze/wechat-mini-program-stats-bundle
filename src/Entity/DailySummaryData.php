@@ -7,17 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailySummaryDataRepository;
 
-#[AsPermission(title: '获取用户小程序访问分布数据')]
 #[Listable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: DailySummaryDataRepository::class)]
 #[ORM\Table(name: 'wechat_daily_summary_data', options: ['comment' => '获取用户小程序访问分布数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'account_id'])]
@@ -25,28 +19,18 @@ class DailySummaryData implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[ListColumn]
-    #[ORM\Column(name: 'date', type: Types::DATE_MUTABLE, nullable: false, options: ['comment' => '数据日期'])]
     private ?\DateTimeInterface $date = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '累计用户数'])]
     private ?string $visitTotal = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 100, options: ['comment' => '转发次数'])]
     private ?string $sharePv = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 100, options: ['comment' => '转发人数'])]
     private ?string $shareUv = null;
 
     #[ORM\ManyToOne]

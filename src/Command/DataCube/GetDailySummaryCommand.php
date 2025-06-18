@@ -24,7 +24,9 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailySummaryRequest;
 #[AsCommand(name: 'wechat-mini-program:GetDailySummaryCommand', description: '获取用户访问小程序数据概况')]
 class GetDailySummaryCommand extends Command
 {
-    public function __construct(
+    
+    public const NAME = 'wechat-mini-program:GetDailySummaryCommand';
+public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailySummaryDataRepository $logRepository,
         private readonly Client $client,

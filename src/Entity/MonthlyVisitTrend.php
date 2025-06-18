@@ -6,13 +6,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\MonthlyVisitTrendRepository;
 
-#[AsPermission(title: '用户访问小程序数据月趋势')]
 #[ORM\Entity(repositoryClass: MonthlyVisitTrendRepository::class)]
 #[ORM\Table(name: 'ims_wechat_mini_program_monthly_visit_trend', options: ['comment' => '用户访问小程序数据月趋势'])]
 #[ORM\UniqueConstraint(name: 'wechat_mini_program_monthly_visit_trend_idx_uniq', columns: ['account_id', 'begin_date', 'end_date'])]
@@ -20,8 +16,6 @@ class MonthlyVisitTrend implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ListColumn(order: -1)]
-    #[ExportColumn]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -39,43 +33,25 @@ class MonthlyVisitTrend implements AdminArrayInterface
     /**
      * 为自然月第一天
      */
-    #[ListColumn]
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true, options: ['comment' => '开始日期'])]
     private \DateTimeInterface $beginDate;
 
     /**
      * 为自然月最后一天
      */
-    #[ListColumn]
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true, options: ['comment' => '结束日期'])]
     private \DateTimeInterface $endDate;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '打开次数（自然月内汇总）'])]
     private ?string $sessionCnt = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '访问次数（自然月内汇总）'])]
     private ?string $visitPv = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '访问人数（自然月内去重）'])]
     private ?string $visitUv = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '新用户数（自然月内去重）'])]
     private ?string $visitUvNew = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '人均停留时长 (浮点型，单位：秒)'])]
     private ?string $stayTimeUv = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '次均停留时长 (浮点型，单位：秒)'])]
     private ?string $stayTimeSession = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '平均访问深度 (浮点型)'])]
     private ?string $visitDepth = null;
 public function getAccount(): ?Account
     {

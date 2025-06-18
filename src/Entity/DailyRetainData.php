@@ -7,19 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Filter\Filterable;
-use Tourze\EasyAdmin\Attribute\Filter\Keyword;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailyRetainDataRepository;
 
-#[AsPermission(title: '获取用户访问小程序日留存')]
 #[Listable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: DailyRetainDataRepository::class)]
 #[ORM\Table(name: 'wechat_daily_retain_data', options: ['comment' => '获取用户访问小程序日留存'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'account_id', 'type'])]
@@ -27,29 +19,18 @@ class DailyRetainData implements AdminArrayInterface
 {
     use TimestampableAware;
 
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[Filterable]
-    #[ListColumn]
-    #[ORM\Column(name: 'date', type: Types::DATE_MUTABLE, nullable: false, options: ['comment' => '数据日期'])]
     private \DateTimeInterface $date;
 
-    #[Keyword]
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '类型'])]
     private ?string $type = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '新增用户数/活跃用户数'])]
     private ?string $userNumber = null;
 
-    #[ListColumn]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;

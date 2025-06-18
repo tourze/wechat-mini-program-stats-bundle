@@ -7,17 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitAgeDataRepository;
 
-#[AsPermission(title: '用户画像分布age(类型)数据')]
 #[Listable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: UserPortraitAgeDataRepository::class)]
 #[ORM\Table(name: 'wechat_user_access_portrait_age_data', options: ['comment' => '用户画像分布age(类型)数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_user_access_portrait_age_data_uniq', columns: ['date', 'type', 'account_id', 'name'])]
@@ -25,8 +19,6 @@ class UserPortraitAgeData implements AdminArrayInterface
 {
     use CreateTimeAware;
 
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -37,24 +29,14 @@ class UserPortraitAgeData implements AdminArrayInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-    #[ListColumn]
-    #[ORM\Column(name: 'date', type: Types::STRING, nullable: true, options: ['comment' => '数据日期'])]
     private ?string $date = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '数据类型(新用户、活跃用户)'])]
     private ?string $type = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '名称'])]
     private ?string $name = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '值'])]
     private ?string $value = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 200, options: ['comment' => '值id'])]
     private ?string $valueId = null;
 
     public function getId(): ?string
