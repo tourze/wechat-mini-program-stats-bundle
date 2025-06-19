@@ -6,16 +6,14 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\OperationPerformanceRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: OperationPerformanceRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_operation_performance', options: ['comment' => '运维中心-查询性能数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_mini_program_operation_performance_uniq', columns: ['account_id', 'date', 'cost_time_type'])]
 class OperationPerformance implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -95,5 +93,10 @@ public function getDate(): ?\DateTimeInterface
             'account' => $this->getAccount(),
             'createTime' => $this->getCreateTime(),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

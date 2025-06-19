@@ -7,16 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserAccessesMonthDataRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: UserAccessesMonthDataRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_user_accesses_month_data', options: ['comment' => '获取用户访问小程序月留存'])]
 #[ORM\UniqueConstraint(name: 'wechat_mini_program_user_accesses_month_data_uniq', columns: ['date', 'account_id', 'type'])]
 class UserAccessesMonthData implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -107,5 +105,10 @@ class UserAccessesMonthData implements AdminArrayInterface
             'account' => $this->getAccount(),
             'createTime' => $this->getCreateTime(),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

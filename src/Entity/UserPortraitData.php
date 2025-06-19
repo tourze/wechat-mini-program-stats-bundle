@@ -7,16 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitDataRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: UserPortraitDataRepository::class)]
 #[ORM\Table(name: 'wechat_user_access_portrait_data', options: ['comment' => '用户画像分布数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_user_access_portrait_data_uniq', columns: ['date', 'name', 'account_id', 'type'])]
 class UserPortraitData implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -220,5 +218,10 @@ class UserPortraitData implements AdminArrayInterface
             'account' => $this->getAccount(),
             'createTime' => $this->getCreateTime(),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

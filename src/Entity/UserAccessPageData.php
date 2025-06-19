@@ -7,16 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserAccessPageDataRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: UserAccessPageDataRepository::class)]
 #[ORM\Table(name: 'wechat_user_access_page_data', options: ['comment' => '用户访问页面数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'page_path', 'account_id'])]
 class UserAccessPageData implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -172,5 +170,10 @@ class UserAccessPageData implements AdminArrayInterface
             'account' => $this->getAccount(),
             'createTime' => $this->getCreateTime(),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

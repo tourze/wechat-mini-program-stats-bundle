@@ -7,16 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailyRetainDataRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: DailyRetainDataRepository::class)]
 #[ORM\Table(name: 'wechat_daily_retain_data', options: ['comment' => '获取用户访问小程序日留存'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'account_id', 'type'])]
 class DailyRetainData implements AdminArrayInterface
-{
+, \Stringable{
     use TimestampableAware;
 
     #[ORM\Id]
@@ -94,5 +92,10 @@ class DailyRetainData implements AdminArrayInterface
             'userNumber' => $this->getUserNumber(),
             'date' => $this->getDate(),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

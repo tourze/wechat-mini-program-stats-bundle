@@ -7,16 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\HourVisitDataRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: HourVisitDataRepository::class)]
 #[ORM\Table(name: 'wechat_hour_visit_data', options: ['comment' => '小程序每小时访问数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_hour_visit_data_idx_uniq', columns: ['date', 'account_id'])]
 class HourVisitData implements AdminArrayInterface
-{
+, \Stringable{
     use TimestampableAware;
 
     #[ORM\Id]
@@ -146,5 +144,10 @@ class HourVisitData implements AdminArrayInterface
     public function setPageNewUserPv(?int $pageNewUserPv): void
     {
         $this->pageNewUserPv = $pageNewUserPv;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

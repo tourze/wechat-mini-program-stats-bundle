@@ -7,16 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\AccessStayTimeInfoDataRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: AccessStayTimeInfoDataRepository::class)]
 #[ORM\Table(name: 'wechat_access_staytime_info_data', options: ['comment' => '获取用户小程序访问分布数据(访问来源分布)'])]
 #[ORM\UniqueConstraint(name: 'wechat_access_staytime_info_data_uniq', columns: ['date', 'account_id', 'data_key'])]
 class AccessStayTimeInfoData implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -94,5 +92,10 @@ class AccessStayTimeInfoData implements AdminArrayInterface
             'account' => $this->getAccount(),
             'createTime' => $this->getCreateTime(),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

@@ -8,16 +8,14 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Enum\PerformanceModule;
 use WechatMiniProgramStatsBundle\Repository\PerformanceRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: PerformanceRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_performance', options: ['comment' => '微信小程序性能'])]
 class Performance implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -137,5 +135,10 @@ class Performance implements AdminArrayInterface
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

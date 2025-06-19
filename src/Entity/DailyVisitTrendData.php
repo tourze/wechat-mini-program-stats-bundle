@@ -8,16 +8,14 @@ use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\Arrayable\ApiArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: DailyVisitTrendDataRepository::class)]
 #[ORM\Table(name: 'wechat_daily_visit_trend_data', options: ['comment' => '获取用户访问小程序数据日趋势'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'account_id'])]
 class DailyVisitTrendData implements ApiArrayInterface, AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -171,5 +169,10 @@ class DailyVisitTrendData implements ApiArrayInterface, AdminArrayInterface
             'account' => $this->getAccount(),
             'createTime' => $this->getCreateTime(),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Repository\WeeklyVisitTrendRepository;
 #[ORM\Table(name: 'ims_wechat_mini_program_weekly_visit_trend', options: ['comment' => '用户访问小程序数据周趋势'])]
 #[ORM\UniqueConstraint(name: 'wechat_mini_program_weekly_visit_trend_idx_uniq', columns: ['account_id', 'begin_date', 'end_date'])]
 class WeeklyVisitTrend implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -175,5 +175,10 @@ public function getAccount(): ?Account
             'account' => $this->getAccount(),
             'createTime' => $this->getCreateTime(),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

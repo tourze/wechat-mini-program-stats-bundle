@@ -14,7 +14,7 @@ use WechatMiniProgramStatsBundle\Repository\DailyPageVisitDataRepository;
 #[ORM\Table(name: 'wechat_daily_page_visit_data', options: ['comment' => '每日页面请求汇总日志'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_page_visit_data_idx_uniq', columns: ['date', 'page'])]
 class DailyPageVisitData implements AdminArrayInterface
-{
+, \Stringable{
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -119,5 +119,10 @@ class DailyPageVisitData implements AdminArrayInterface
             'createTime' => $this->getCreateTime()?->format('Y-m-d H:i:s'),
             'updateTime' => $this->getUpdateTime()?->format('Y-m-d H:i:s'),
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

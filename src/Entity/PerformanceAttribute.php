@@ -8,14 +8,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramStatsBundle\Repository\PerformanceAttributeRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: PerformanceAttributeRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_performance_attribute', options: ['comment' => '微信小程序性能属性表'])]
 class PerformanceAttribute implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -83,5 +81,10 @@ public function retrieveAdminArray(): array
         $this->performance = $performance;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

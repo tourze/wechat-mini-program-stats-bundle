@@ -7,16 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\VisitDistributionDataRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: VisitDistributionDataRepository::class)]
 #[ORM\Table(name: 'wechat_visit_distribution_data', options: ['comment' => '获取用户小程序访问分布数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_visit_distribution_data_uniq', columns: ['date', 'account_id', 'type', 'scene_id', 'scene_id_pv'])]
 class VisitDistributionData implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -107,5 +105,10 @@ class VisitDistributionData implements AdminArrayInterface
         $this->account = $account;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }

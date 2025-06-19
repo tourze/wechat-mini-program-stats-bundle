@@ -7,16 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: DailyNewUserVisitPvRepository::class)]
 #[ORM\Table(name: 'wechat_daily_new_user_visit_pv', options: ['comment' => '新用户访问小程序次数'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_new_user_visit_pv_idx_uniq', columns: ['date', 'account_id'])]
 class DailyNewUserVisitPv implements AdminArrayInterface
-{
+, \Stringable{
     use CreateTimeAware;
 
     #[ORM\Id]
@@ -106,5 +104,10 @@ class DailyNewUserVisitPv implements AdminArrayInterface
     public function setVisitPv(?int $visitPv): void
     {
         $this->visitPv = $visitPv;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->getId();
     }
 }
