@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -23,9 +23,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetWechatMiniUserAccessesMonth
 // 每个月1号执行
 #[AsCronTask('44 22 * * *')]
 #[AsCronTask('47 23 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetUserAccessesMonthDataCommand', description: '获取用户访问小程序月留存')]
+#[AsCommand(name: self::NAME, description: '获取用户访问小程序月留存')]
 class GetUserAccessesMonthDataCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:user-accesses:month-data:get';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly UserAccessesMonthDataRepository $userAccessesMonthDataRepository,
@@ -41,8 +42,8 @@ class GetUserAccessesMonthDataCommand extends LockableCommand
         foreach ($this->accountRepository->findBy(['valid' => true]) as $account) {
             $request = new GetWechatMiniUserAccessesMonthDataRequest();
             $request->setAccount($account);
-            $request->setBeginDate(Carbon::now()->subMonth()->startOfMonth());
-            $request->setEndDate(Carbon::now()->subMonth()->endOfMonth());
+            $request->setBeginDate(CarbonImmutable::now()->subMonth()->startOfMonth());
+            $request->setEndDate(CarbonImmutable::now()->subMonth()->endOfMonth());
 
             try {
                 $res = $this->client->request($request);
@@ -60,7 +61,7 @@ class GetUserAccessesMonthDataCommand extends LockableCommand
                         'account' => $account,
                         'type' => 'visit_uv_new',
                     ]);
-                    if (!$userAccessesMonthData) {
+                    if ($userAccessesMonthData === null) {
                         $userAccessesMonthData = new UserAccessesMonthData();
                         $userAccessesMonthData->setAccount($account);
                         $userAccessesMonthData->setDate($res['ref_date']);
@@ -80,7 +81,7 @@ class GetUserAccessesMonthDataCommand extends LockableCommand
                         'account' => $account,
                         'type' => 'visit_uv',
                     ]);
-                    if (!$userAccessesMonthData) {
+                    if ($userAccessesMonthData === null) {
                         $userAccessesMonthData = new UserAccessesMonthData();
                         $userAccessesMonthData->setAccount($account);
                         $userAccessesMonthData->setDate($res['ref_date']);

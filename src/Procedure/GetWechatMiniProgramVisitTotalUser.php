@@ -31,7 +31,7 @@ class GetWechatMiniProgramVisitTotalUser extends CacheableProcedure
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if (!$account) {
+        if ($account === null) {
             throw new ApiException('找不到小程序');
         }
 
@@ -41,8 +41,8 @@ class GetWechatMiniProgramVisitTotalUser extends CacheableProcedure
 
         return [
             'total' => $row[0]->getVisitTotal(),
-            'totalCompare' => $row[1]->getVisitTotal() ? round(((int) $row[0]->getVisitTotal() - (int) $row[1]->getVisitTotal()) / (int) $row[1]->getVisitTotal(), 4) : 0,
-            'totalSevenCompare' => $row[7]->getVisitTotal() ? round(((int) $row[0]->getVisitTotal() - (int) $row[7]->getVisitTotal()) / (int) $row[7]->getVisitTotal(), 4) : 0,
+            'totalCompare' => ($row[1]->getVisitTotal() !== null && $row[1]->getVisitTotal() > 0) ? round(((int) $row[0]->getVisitTotal() - (int) $row[1]->getVisitTotal()) / (int) $row[1]->getVisitTotal(), 4) : 0,
+            'totalSevenCompare' => ($row[7]->getVisitTotal() !== null && $row[7]->getVisitTotal() > 0) ? round(((int) $row[0]->getVisitTotal() - (int) $row[7]->getVisitTotal()) / (int) $row[7]->getVisitTotal(), 4) : 0,
         ];
     }
 

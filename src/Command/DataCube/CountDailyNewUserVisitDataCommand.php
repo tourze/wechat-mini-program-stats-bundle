@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command\DataCube;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -16,9 +16,10 @@ use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
 
 #[AsCronTask('50 2 * * *')]
 #[AsCronTask('28 5 * * *')]
-#[AsCommand(name: 'wechat-mini-program:CountDailyNewUserVisitDataCommand', description: '新用户访问小程序次数')]
+#[AsCommand(name: self::NAME, description: '新用户访问小程序次数')]
 class CountDailyNewUserVisitDataCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:count-daily-new-user-visit-data';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailyNewUserVisitPvRepository $logRepository,
@@ -30,10 +31,10 @@ class CountDailyNewUserVisitDataCommand extends LockableCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $connection = $this->entityManager->getConnection();
-        $date = Carbon::now();
+        $date = CarbonImmutable::now();
         $output->writeln($date);
-        $start = Carbon::now()->subDay()->startOfDay();
-        $end = Carbon::now()->subDay()->endOfDay();
+        $start = CarbonImmutable::now()->subDay()->startOfDay();
+        $end = CarbonImmutable::now()->subDay()->endOfDay();
         $accounts = $this->accountRepository->findAll();
         foreach ($accounts as $account) {
             $sql = "select count(*) as coun from biz_user u LEFT JOIN wechat_mini_program_code_session_log c on u.username=c.open_id where c.account_id={$account->getId()} and u.create_time between '{$start}' and '{$end}' and c.create_time between '{$start}' and '{$end}'";

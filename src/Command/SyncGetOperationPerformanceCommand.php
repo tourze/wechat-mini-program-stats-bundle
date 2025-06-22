@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,11 +22,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetOperationPerformanceRequest
  *
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/operation/getPerformance.html
  */
-#[AsCommand(name: 'wechat:official-account:SyncGetOperationPerformanceCommand', description: '运维中心-查询性能数据')]
+#[AsCommand(name: self::NAME, description: '运维中心-查询性能数据')]
 class SyncGetOperationPerformanceCommand extends Command
 {
-    
-    public const NAME = 'wechat:official-account:SyncGetOperationPerformanceCommand';
+    public const NAME = 'wechat-mini-program:operation-performance:sync';
 public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly Client $client,
@@ -39,7 +38,7 @@ public function __construct(
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $now = Carbon::now();
+        $now = CarbonImmutable::now();
         foreach ($this->accountRepository->findBy(['valid' => true]) as $account) {
             foreach (CostTimeType::cases() as $costTimeType) {
                 $request = new GetOperationPerformanceRequest();
@@ -71,7 +70,7 @@ public function __construct(
                         'date' => $item['ref_date'],
                         'cost_time_type' => $item['cost_time_type'],
                     ]);
-                    if (!$operationPerformance) {
+                    if ($operationPerformance === null) {
                         $operationPerformance = new OperationPerformance();
                         $operationPerformance->setAccount($account);
                         $operationPerformance->setDate($item['ref_date']);

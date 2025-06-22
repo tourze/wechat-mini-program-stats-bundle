@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Tests\Service;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -60,8 +60,8 @@ class WechatUserPortraitServiceTest extends TestCase
     {
         // 创建测试数据
         $account = $this->createMock(Account::class);
-        $start = Carbon::parse('2023-01-01');
-        $end = Carbon::parse('2023-01-07');
+        $start = CarbonImmutable::parse('2023-01-01');
+        $end = CarbonImmutable::parse('2023-01-07');
         
         // 模拟API响应
         $apiResponse = [
@@ -140,8 +140,8 @@ class WechatUserPortraitServiceTest extends TestCase
     {
         // 创建测试数据
         $account = $this->createMock(Account::class);
-        $start = Carbon::parse('2023-01-01');
-        $end = Carbon::parse('2023-01-07');
+        $start = CarbonImmutable::parse('2023-01-01');
+        $end = CarbonImmutable::parse('2023-01-07');
         
         // 模拟现有实体
         $existingProvinceData = new UserPortraitProvinceData();
@@ -204,8 +204,8 @@ class WechatUserPortraitServiceTest extends TestCase
     {
         // 创建测试数据
         $account = $this->createMock(Account::class);
-        $start = Carbon::parse('2023-01-01');
-        $end = Carbon::parse('2023-01-07');
+        $start = CarbonImmutable::parse('2023-01-01');
+        $end = CarbonImmutable::parse('2023-01-07');
         
         $exception = new \Exception('API Error');
         
@@ -243,8 +243,8 @@ class WechatUserPortraitServiceTest extends TestCase
     {
         // 创建测试数据
         $account = $this->createMock(Account::class);
-        $start = Carbon::parse('2023-01-01');
-        $end = Carbon::parse('2023-01-07');
+        $start = CarbonImmutable::parse('2023-01-01');
+        $end = CarbonImmutable::parse('2023-01-07');
         
         // 模拟API响应 - 不包含visit_uv_new
         $apiResponse = [

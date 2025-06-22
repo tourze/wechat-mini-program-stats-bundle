@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Tests\Request\DataCube;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use PHPUnit\Framework\TestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Request\DataCube\GetWechatUserPortraitRequest;
@@ -26,8 +26,8 @@ class GetWechatUserPortraitRequestTest extends TestCase
 
     public function testGetRequestOptions_returnsCorrectlyFormattedOptions(): void
     {
-        $beginDate = Carbon::parse('2023-01-01');
-        $endDate = Carbon::parse('2023-01-07');
+        $beginDate = CarbonImmutable::parse('2023-01-01');
+        $endDate = CarbonImmutable::parse('2023-01-07');
         
         $this->request->setBeginDate($beginDate);
         $this->request->setEndDate($endDate);
@@ -45,7 +45,7 @@ class GetWechatUserPortraitRequestTest extends TestCase
 
     public function testBeginDate_getterAndSetter(): void
     {
-        $beginDate = Carbon::parse('2023-01-01');
+        $beginDate = CarbonImmutable::parse('2023-01-01');
         
         $this->request->setBeginDate($beginDate);
         
@@ -54,7 +54,7 @@ class GetWechatUserPortraitRequestTest extends TestCase
 
     public function testEndDate_getterAndSetter(): void
     {
-        $endDate = Carbon::parse('2023-01-07');
+        $endDate = CarbonImmutable::parse('2023-01-07');
         
         $this->request->setEndDate($endDate);
         

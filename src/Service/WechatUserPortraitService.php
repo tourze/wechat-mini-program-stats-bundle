@@ -60,7 +60,7 @@ class WechatUserPortraitService
                     'name' => $provinceValue['name'],
                     'type' => 'visit_uv_new',
                 ]);
-                if (!$provinceData) {
+                if ($provinceData === null) {
                     $provinceData = new UserPortraitProvinceData();
                     $provinceData->setAccount($account);
                     $provinceData->setType('visit_uv_new');
@@ -85,7 +85,7 @@ class WechatUserPortraitService
                     'name' => $cityValue['name'],
                     'type' => 'visit_uv_new',
                 ]);
-                if (!$cityData) {
+                if ($cityData === null) {
                     $cityData = new UserPortraitCityData();
                     $cityData->setAccount($account);
                     $cityData->setName($cityValue['name']);
@@ -110,7 +110,7 @@ class WechatUserPortraitService
                     'name' => $genderValue['name'],
                     'type' => 'visit_uv_new',
                 ]);
-                if (!$genderData) {
+                if ($genderData === null) {
                     $genderData = new UserPortraitGendersData();
                     $genderData->setAccount($account);
                     $genderData->setType('visit_uv_new');
@@ -135,7 +135,7 @@ class WechatUserPortraitService
                     'name' => $platformValue['name'],
                     'type' => 'visit_uv_new',
                 ]);
-                if (!$platformData) {
+                if ($platformData === null) {
                     $platformData = new UserPortraitPlatformData();
                     $platformData->setAccount($account);
                     $platformData->setType('visit_uv_new');
@@ -160,7 +160,7 @@ class WechatUserPortraitService
                     'name' => $deviceValue['name'],
                     'type' => 'visit_uv_new',
                 ]);
-                if (!$deviceData) {
+                if ($deviceData === null) {
                     $deviceData = new UserPortraitDeviceData();
                     $deviceData->setAccount($account);
                     $deviceData->setType('visit_uv_new');
@@ -185,7 +185,7 @@ class WechatUserPortraitService
                     'name' => $ageValue['name'],
                     'type' => 'visit_uv_new',
                 ]);
-                if (!$ageData) {
+                if ($ageData === null) {
                     $ageData = new UserPortraitAgeData();
                     $ageData->setAccount($account);
                     $ageData->setType('visit_uv_new');
@@ -211,7 +211,7 @@ class WechatUserPortraitService
                     'name' => $provinceValue['name'],
                     'type' => 'visit_uv',
                 ]);
-                if (!$provinceData) {
+                if ($provinceData === null) {
                     $provinceData = new UserPortraitProvinceData();
                     $provinceData->setAccount($account);
                     $provinceData->setType('visit_uv');
@@ -236,7 +236,7 @@ class WechatUserPortraitService
                     'type' => 'visit_uv',
                     'name' => $cityValue['name'],
                 ]);
-                if (!$cityData) {
+                if ($cityData === null) {
                     $cityData = new UserPortraitCityData();
                     $cityData->setAccount($account);
                     $cityData->setType('visit_uv');
@@ -261,7 +261,7 @@ class WechatUserPortraitService
                     'type' => 'visit_uv',
                     'name' => $genderValue['name'],
                 ]);
-                if (!$genderData) {
+                if ($genderData === null) {
                     $genderData = new UserPortraitGendersData();
                     $genderData->setAccount($account);
                     $genderData->setType('visit_uv');
@@ -286,7 +286,7 @@ class WechatUserPortraitService
                     'type' => 'visit_uv',
                     'name' => $platformValue['name'],
                 ]);
-                if (!$platformData) {
+                if ($platformData === null) {
                     $platformData = new UserPortraitPlatformData();
                     $platformData->setAccount($account);
                     $platformData->setType('visit_uv');
@@ -310,7 +310,7 @@ class WechatUserPortraitService
                     'account' => $account,
                     'type' => 'visit_uv',
                 ]);
-                if (!$deviceData) {
+                if ($deviceData === null) {
                     $deviceData = new UserPortraitDeviceData();
                     $deviceData->setAccount($account);
                     $deviceData->setType('visit_uv');
@@ -335,7 +335,7 @@ class WechatUserPortraitService
                     'type' => 'visit_uv',
                     'name' => $ageValue['name'],
                 ]);
-                if (!$ageData) {
+                if ($ageData === null) {
                     $ageData = new UserPortraitAgeData();
                     $ageData->setAccount($account);
                     $ageData->setType('visit_uv');

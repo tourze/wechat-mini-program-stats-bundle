@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Procedure;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -35,7 +35,7 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if (!$account) {
+        if ($account === null) {
             throw new ApiException('找不到小程序');
         }
 
@@ -43,7 +43,7 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
             ->select('sum(p.pageVisitPv)')
             ->where('p.account = :account and p.date = :date')
             ->setParameter('account', $account)
-            ->setParameter('date', Carbon::parse($this->date)->startOfDay())
+            ->setParameter('date', CarbonImmutable::parse($this->date)->startOfDay())
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -51,7 +51,7 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
             ->select('sum(p.pageVisitPv)')
             ->where('p.account = :account and p.date = :date')
             ->setParameter('account', $account)
-            ->setParameter('date', Carbon::parse($this->date)->subDay()->startOfDay())
+            ->setParameter('date', CarbonImmutable::parse($this->date)->subDay()->startOfDay())
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -59,7 +59,7 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
             ->select('sum(p.pageVisitPv)')
             ->where('p.account = :account and p.date = :date')
             ->setParameter('account', $account)
-            ->setParameter('date', Carbon::parse($this->date)->subDays(7)->startOfDay())
+            ->setParameter('date', CarbonImmutable::parse($this->date)->subDays(7)->startOfDay())
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -72,7 +72,7 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramPageVisitTotalDataByDate_{$request->getParams()->get('accountId')}_" . Carbon::parse($request->getParams()->get('date'))->startOfDay();
+        return "GetWechatMiniProgramPageVisitTotalDataByDate_{$request->getParams()->get('accountId')}_" . CarbonImmutable::parse($request->getParams()->get('date'))->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int

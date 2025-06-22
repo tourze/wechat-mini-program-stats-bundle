@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,9 +22,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetWechatMiniUserAccessesWeekD
  */
 #[AsCronTask('33 21 * * *')]
 #[AsCronTask('37 22 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetUserAccessesWeekDataCommand', description: '获取用户访问小程序周留存')]
+#[AsCommand(name: self::NAME, description: '获取用户访问小程序周留存')]
 class GetUserAccessesWeekDataCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:user-accesses:week-data:get';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly UserAccessesWeekDataRepository $userAccessesWeekDataRepository,
@@ -40,8 +41,8 @@ class GetUserAccessesWeekDataCommand extends LockableCommand
         foreach ($this->accountRepository->findBy(['valid' => true]) as $account) {
             $request = new GetWechatMiniUserAccessesWeekDataRequest();
             $request->setAccount($account);
-            $request->setBeginDate(Carbon::now()->weekday(1)->subDays(7));
-            $request->setEndDate(Carbon::now()->weekday(6)->subDays(6));
+            $request->setBeginDate(CarbonImmutable::now()->weekday(1)->subDays(7));
+            $request->setEndDate(CarbonImmutable::now()->weekday(6)->subDays(6));
 
             try {
                 $res = $this->client->request($request);
@@ -59,7 +60,7 @@ class GetUserAccessesWeekDataCommand extends LockableCommand
                         'account' => $account,
                         'type' => 'visit_uv_new',
                     ]);
-                    if (!$userAccessesWeekData) {
+                    if ($userAccessesWeekData === null) {
                         $userAccessesWeekData = new UserAccessesWeekData();
                         $userAccessesWeekData->setAccount($account);
                         $userAccessesWeekData->setDate($res['ref_date']);
@@ -79,7 +80,7 @@ class GetUserAccessesWeekDataCommand extends LockableCommand
                         'account' => $account,
                         'type' => 'visit_uv',
                     ]);
-                    if (!$userAccessesWeekData) {
+                    if ($userAccessesWeekData === null) {
                         $userAccessesWeekData = new UserAccessesWeekData();
                         $userAccessesWeekData->setAccount($account);
                         $userAccessesWeekData->setDate($res['ref_date']);

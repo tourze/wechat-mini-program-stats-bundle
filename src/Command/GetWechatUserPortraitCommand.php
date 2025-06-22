@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,9 +17,10 @@ use WechatMiniProgramStatsBundle\Service\WechatUserPortraitService;
  */
 #[AsCronTask('1 12 * * *')]
 #[AsCronTask('6 21 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetWechatUserPortraitCommand', description: '获取用户用户画像分布')]
+#[AsCommand(name: self::NAME, description: '获取用户用户画像分布')]
 class GetWechatUserPortraitCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:user-portrait:get';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly WechatUserPortraitService $service,
@@ -30,8 +31,8 @@ class GetWechatUserPortraitCommand extends LockableCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         foreach ($this->accountRepository->findBy(['valid' => true]) as $account) {
-            $this->service->getDate($account, Carbon::now()->subDays(), Carbon::now()->subDays());
-            $this->service->getDate($account, Carbon::now()->subDays(7), Carbon::now()->subDays());
+            $this->service->getDate($account, CarbonImmutable::now()->subDays(), CarbonImmutable::now()->subDays());
+            $this->service->getDate($account, CarbonImmutable::now()->subDays(7), CarbonImmutable::now()->subDays());
         }
 
         return Command::SUCCESS;

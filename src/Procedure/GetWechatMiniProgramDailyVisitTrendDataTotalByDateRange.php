@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Procedure;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
@@ -54,9 +54,9 @@ class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableP
             'visitUvNewTotal' => array_sum($visitUvNewArr),
         ];
 
-        $day = Carbon::parse($this->startDate)->diffInDays(Carbon::parse($this->endDate));
-        $this->logic->startDate = Carbon::parse($this->startDate)->subDays($day);
-        $this->logic->endDate = Carbon::parse($this->endDate)->subDays($day);
+        $day = CarbonImmutable::parse($this->startDate)->diffInDays(CarbonImmutable::parse($this->endDate));
+        $this->logic->startDate = CarbonImmutable::parse($this->startDate)->subDays($day);
+        $this->logic->endDate = CarbonImmutable::parse($this->endDate)->subDays($day);
         $beforeList = $this->logic->execute();
 
         $beforeSessionCntTotal = array_sum(array_column($beforeList, 'sessionCnt'));
@@ -83,8 +83,8 @@ class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableP
     public function getCacheKey(JsonRpcRequest $request): string
     {
         return "GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange_{$request->getParams()->get('accountId')}_" .
-            Carbon::parse($request->getParams()->get('startDate'))->startOfDay()
-            . '_' . Carbon::parse($request->getParams()->get('endDate'))->startOfDay();
+            CarbonImmutable::parse($request->getParams()->get('startDate'))->startOfDay()
+            . '_' . CarbonImmutable::parse($request->getParams()->get('endDate'))->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int

@@ -21,9 +21,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetMonthlyVisitTrendRequest;
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/visit-trend/getMonthlyVisitTrend.html
  */
 #[AsCronTask('15 */6 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetMonthlyVisitTrendCommand', description: '获取用户访问小程序数据月趋势')]
+#[AsCommand(name: self::NAME, description: '获取用户访问小程序数据月趋势')]
 class GetMonthlyVisitTrendCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:get-monthly-visit-trend';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly MonthlyVisitTrendRepository $logRepository,
@@ -68,7 +69,7 @@ class GetMonthlyVisitTrendCommand extends LockableCommand
                     'endDate' => $endDate,
                     'account' => $account,
                 ]);
-                if (!$log) {
+                if ($log === null) {
                     $log = new MonthlyVisitTrend();
                     $log->setAccount($account);
                     $log->setBeginDate($beginDate);

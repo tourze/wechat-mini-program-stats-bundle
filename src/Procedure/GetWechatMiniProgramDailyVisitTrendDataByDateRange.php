@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Procedure;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -38,15 +38,15 @@ class GetWechatMiniProgramDailyVisitTrendDataByDateRange extends CacheableProced
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if (!$account) {
+        if ($account === null) {
             throw new ApiException('找不到小程序');
         }
 
         $row = $this->trendDataRepository->createQueryBuilder('t')
             ->where('t.account = :account and t.date between :start and :end')
             ->setParameter('account', $account)
-            ->setParameter('start', Carbon::parse($this->startDate)->startOfDay())
-            ->setParameter('end', Carbon::parse($this->endDate)->startOfDay())
+            ->setParameter('start', CarbonImmutable::parse($this->startDate)->startOfDay())
+            ->setParameter('end', CarbonImmutable::parse($this->endDate)->startOfDay())
             ->getQuery()
             ->getResult();
 
@@ -61,8 +61,8 @@ class GetWechatMiniProgramDailyVisitTrendDataByDateRange extends CacheableProced
     public function getCacheKey(JsonRpcRequest $request): string
     {
         return "GetWechatMiniProgramDailyVisitTrendDataByDateRange_{$request->getParams()->get('accountId')}_"
-            . Carbon::parse($request->getParams()->get('startDate'))->startOfDay()
-            . '_' . Carbon::parse($request->getParams()->get('endDate'))->startOfDay();
+            . CarbonImmutable::parse($request->getParams()->get('startDate'))->startOfDay()
+            . '_' . CarbonImmutable::parse($request->getParams()->get('endDate'))->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int

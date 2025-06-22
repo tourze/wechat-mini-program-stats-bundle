@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Tests\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -53,8 +53,8 @@ class GetWechatUserPortraitCommandTest extends TestCase
             ->with(['valid' => true])
             ->willReturn([$account1, $account2]);
 
-        // 修复Carbon::now()的测试问题，使用Carbon::setTestNow()
-        Carbon::setTestNow(Carbon::parse('2023-01-10'));
+        // 修复CarbonImmutable::now()的测试问题，使用CarbonImmutable::setTestNow()
+        CarbonImmutable::setTestNow(CarbonImmutable::parse('2023-01-10'));
 
         // 在 PHPUnit 10 中，at() 和 withConsecutive() 都已被移除
         // 我们可以简单地验证 getDate 被调用了预期的次数
@@ -67,7 +67,7 @@ class GetWechatUserPortraitCommandTest extends TestCase
         $this->assertEquals(Command::SUCCESS, $result);
 
         // 清除测试时间
-        Carbon::setTestNow();
+        CarbonImmutable::setTestNow();
     }
 
     public function testExecute_withNoValidAccounts_returnsSuccessWithoutCallingService(): void

@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,9 +22,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetPerformanceDataRequest;
  */
 #[AsCronTask('55 22 * * *')]
 #[AsCronTask('54 23 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetPerformanceDataCommand', description: '获取小程序性能数据')]
+#[AsCommand(name: self::NAME, description: '获取小程序性能数据')]
 class GetPerformanceDataCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:performance-data:get';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly PerformanceDataRepository $dataRepository,
@@ -259,8 +260,8 @@ class GetPerformanceDataCommand extends LockableCommand
             $request = new GetPerformanceDataRequest();
             $request->setAccount($account);
             $timeArr = [
-                'begin_timestamp' => strtotime(Carbon::now()->weekday(1)->subDays(7)),
-                'end_timestamp' => strtotime(Carbon::now()->weekday(6)->subDays(6)),
+                'begin_timestamp' => strtotime(CarbonImmutable::now()->weekday(1)->subDays(7)),
+                'end_timestamp' => strtotime(CarbonImmutable::now()->weekday(6)->subDays(6)),
             ];
             $timeObj = (object) $timeArr;
             $request->setTime($timeObj);
@@ -289,15 +290,15 @@ class GetPerformanceDataCommand extends LockableCommand
                     foreach ($res['data']['body']['tables'] as $tableValue) {
                         foreach ($tableValue['lines'][0]['fields'] as $key => $value) {
                             $dataRow = $this->dataRepository->findOneBy([
-                                'date' => Carbon::parse($tableValue['lines'][0]['fields'][$key]['refdate']),
+                                'date' => CarbonImmutable::parse($tableValue['lines'][0]['fields'][$key]['refdate']),
                                 'account' => $account,
                                 'description' => $tableValue['zh'],
                             ]);
-                            if (!$dataRow) {
+                            if ($dataRow === null) {
                                 $dataRow = new PerformanceData();
                                 $dataRow->setAccount($account);
                                 $dataRow->setDescription($tableValue['zh']);
-                                $dataRow->setDate(Carbon::parse($tableValue['lines'][0]['fields'][$key]['refdate']));
+                                $dataRow->setDate(CarbonImmutable::parse($tableValue['lines'][0]['fields'][$key]['refdate']));
                             }
                             $networkType = '';
                             if ((bool) isset($paramsValue['networktype'])) {

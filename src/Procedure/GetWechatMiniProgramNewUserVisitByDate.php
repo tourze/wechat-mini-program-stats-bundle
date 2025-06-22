@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Procedure;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -36,38 +36,38 @@ class GetWechatMiniProgramNewUserVisitByDate extends CacheableProcedure
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if (!$account) {
+        if ($account === null) {
             throw new ApiException('找不到小程序');
         }
 
         $row = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->startOfDay(),
         ]);
-        if (!$row) {
+        if ($row === null) {
             $row = new DailyNewUserVisitPv();
         }
 
         $beforeRow = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->subDay()->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->subDay()->startOfDay(),
         ]);
 
         $beforeSevenRow = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->subDays(7)->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->subDays(7)->startOfDay(),
         ]);
 
         return [
             'visitPv' => $row->getVisitPv(),
-            'visitPvCompare' => $beforeRow && $beforeRow->getVisitPv() > 0 ? round(($row->getVisitPv() - $beforeRow->getVisitPv()) / $beforeRow->getVisitPv(), 4) : null,
-            'visitPvSevenCompare' => $beforeSevenRow && $beforeSevenRow->getVisitPv() > 0 ? round(($row->getVisitPv() - $beforeSevenRow->getVisitPv()) / $beforeSevenRow->getVisitPv(), 4) : null,
+            'visitPvCompare' => ($beforeRow !== null && $beforeRow->getVisitPv() > 0) ? round(($row->getVisitPv() - $beforeRow->getVisitPv()) / $beforeRow->getVisitPv(), 4) : null,
+            'visitPvSevenCompare' => ($beforeSevenRow !== null && $beforeSevenRow->getVisitPv() > 0) ? round(($row->getVisitPv() - $beforeSevenRow->getVisitPv()) / $beforeSevenRow->getVisitPv(), 4) : null,
         ];
     }
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramNewUserVisitByDate_{$request->getParams()->get('accountId')}_" . Carbon::parse($request->getParams()->get('date'))->startOfDay();
+        return "GetWechatMiniProgramNewUserVisitByDate_{$request->getParams()->get('accountId')}_" . CarbonImmutable::parse($request->getParams()->get('date'))->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int

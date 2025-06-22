@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command\DataCube;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -21,11 +21,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailySummaryRequest;
  */
 #[AsCronTask('4 2 * * *')]
 #[AsCronTask('11 5 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetDailySummaryCommand', description: '获取用户访问小程序数据概况')]
+#[AsCommand(name: self::NAME, description: '获取用户访问小程序数据概况')]
 class GetDailySummaryCommand extends Command
 {
-    
-    public const NAME = 'wechat-mini-program:GetDailySummaryCommand';
+    public const NAME = 'wechat-mini-program:get-daily-summary';
 public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailySummaryDataRepository $logRepository,
@@ -41,8 +40,8 @@ public function __construct(
         foreach ($this->accountRepository->findBy(['valid' => true]) as $account) {
             $request = new GetDailySummaryRequest();
             $request->setAccount($account);
-            $request->setBeginDate(Carbon::now()->subDays());
-            $request->setEndDate(Carbon::now()->subDays());
+            $request->setBeginDate(CarbonImmutable::now()->subDays());
+            $request->setEndDate(CarbonImmutable::now()->subDays());
 
             try {
                 $res = $this->client->request($request);
@@ -60,13 +59,13 @@ public function __construct(
 
             foreach ($res['list'] as $value) {
                 $log = $this->logRepository->findOneBy([
-                    'date' => Carbon::parse($value['ref_date']),
+                    'date' => CarbonImmutable::parse($value['ref_date']),
                     'account' => $account,
                 ]);
-                if (!$log) {
+                if ($log === null) {
                     $log = new DailySummaryData();
                     $log->setAccount($account);
-                    $log->setDate(Carbon::parse($value['ref_date']));
+                    $log->setDate(CarbonImmutable::parse($value['ref_date']));
                 }
                 $log->setVisitTotal($value['visit_total']);
                 $log->setSharePv($value['share_pv']);

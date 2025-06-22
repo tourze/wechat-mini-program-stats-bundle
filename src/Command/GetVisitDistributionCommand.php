@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -28,9 +28,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetVisitDistriButionRequest;
  */
 #[AsCronTask('34 21 * * *')]
 #[AsCronTask('38 22 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetVisitDistributionCommand', description: '获取小程序访问分布数据')]
+#[AsCommand(name: self::NAME, description: '获取小程序访问分布数据')]
 class GetVisitDistributionCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:visit-distribution:get';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly AccessSourceSessionCntRepository $wechatAccessSourceSessionCntRepository,
@@ -49,8 +50,8 @@ class GetVisitDistributionCommand extends LockableCommand
         foreach ($this->accountRepository->findBy(['valid' => true]) as $account) {
             $request = new GetVisitDistriButionRequest();
             $request->setAccount($account);
-            $request->setBeginDate(Carbon::now()->subDays());
-            $request->setEndDate(Carbon::now()->subDays());
+            $request->setBeginDate(CarbonImmutable::now()->subDays());
+            $request->setEndDate(CarbonImmutable::now()->subDays());
 
             try {
                 $res = $this->client->request($request);
@@ -67,12 +68,12 @@ class GetVisitDistributionCommand extends LockableCommand
                         foreach ($list['item_list'] as $value) {
                             $data = $this->wechatAccessStaytimeInfoDataRepository->findOneBy([
                                 'account' => $account,
-                                'date' => Carbon::parse($res['ref_date']),
+                                'date' => CarbonImmutable::parse($res['ref_date']),
                                 'dataKey' => $value['key'],
                             ]);
-                            if (!$data) {
+                            if ($data === null) {
                                 $data = new AccessStayTimeInfoData();
-                                $data->setDate(Carbon::parse($res['ref_date']));
+                                $data->setDate(CarbonImmutable::parse($res['ref_date']));
                                 $data->setAccount($account);
                                 $data->setDataKey($value['key']);
                             }
@@ -86,12 +87,12 @@ class GetVisitDistributionCommand extends LockableCommand
                         foreach ($list['item_list'] as $value) {
                             $data = $this->wechatAccessSourceVisitUvRepository->findOneBy([
                                 'account' => $account,
-                                'date' => Carbon::parse($res['ref_date']),
+                                'date' => CarbonImmutable::parse($res['ref_date']),
                                 'dataKey' => $value['key'],
                             ]);
-                            if (!$data) {
+                            if ($data === null) {
                                 $data = new AccessSourceVisitUv();
-                                $data->setDate(Carbon::parse($res['ref_date']));
+                                $data->setDate(CarbonImmutable::parse($res['ref_date']));
                                 $data->setAccount($account);
                                 $data->setDataKey($value['key']);
                             }
@@ -105,12 +106,12 @@ class GetVisitDistributionCommand extends LockableCommand
                         foreach ($list['item_list'] as $value) {
                             $data = $this->wechatAccessDepthInfoDataRepository->findOneBy([
                                 'account' => $account,
-                                'date' => Carbon::parse($res['ref_date']),
+                                'date' => CarbonImmutable::parse($res['ref_date']),
                                 'dataKey' => $value['key'],
                             ]);
-                            if (!$data) {
+                            if ($data === null) {
                                 $data = new AccessDepthInfoData();
-                                $data->setDate(Carbon::parse($res['ref_date']));
+                                $data->setDate(CarbonImmutable::parse($res['ref_date']));
                                 $data->setAccount($account);
                                 $data->setDataKey($value['key']);
                             }
@@ -124,12 +125,12 @@ class GetVisitDistributionCommand extends LockableCommand
                         foreach ($list['item_list'] as $value) {
                             $data = $this->wechatAccessSourceSessionCntRepository->findOneBy([
                                 'account' => $account,
-                                'date' => Carbon::parse($res['ref_date']),
+                                'date' => CarbonImmutable::parse($res['ref_date']),
                                 'dataKey' => $value['key'],
                             ]);
-                            if (!$data) {
+                            if ($data === null) {
                                 $data = new AccessSourceSessionCnt();
-                                $data->setDate(Carbon::parse($res['ref_date']));
+                                $data->setDate(CarbonImmutable::parse($res['ref_date']));
                                 $data->setAccount($account);
                                 $data->setDataKey($value['key']);
                             }

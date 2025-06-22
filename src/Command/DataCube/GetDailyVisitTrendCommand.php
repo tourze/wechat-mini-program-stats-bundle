@@ -2,7 +2,6 @@
 
 namespace WechatMiniProgramStatsBundle\Command\DataCube;
 
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -23,9 +22,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailyVisitTrendRequest;
  */
 // 每天0点跑
 #[AsCronTask('5 */6 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetDailyVisitTrendCommand', description: '获取用户访问小程序数据日趋势')]
+#[AsCommand(name: self::NAME, description: '获取用户访问小程序数据日趋势')]
 class GetDailyVisitTrendCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:get-daily-visit-trend';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailyVisitTrendDataRepository $logRepository,
@@ -81,13 +81,13 @@ class GetDailyVisitTrendCommand extends LockableCommand
                     $output->writeln(json_encode($value, JSON_PRETTY_PRINT));
 
                     $log = $this->logRepository->findOneBy([
-                        'date' => Carbon::parse($value['ref_date']),
+                        'date' => CarbonImmutable::parse($value['ref_date']),
                         'account' => $account,
                     ]);
-                    if (!$log) {
+                    if ($log === null) {
                         $log = new DailyVisitTrendData();
                         $log->setAccount($account);
-                        $log->setDate(Carbon::parse($value['ref_date']));
+                        $log->setDate(CarbonImmutable::parse($value['ref_date']));
                     }
                     $log->setSessionCnt($value['session_cnt']);
                     $log->setVisitPv($value['visit_pv']);

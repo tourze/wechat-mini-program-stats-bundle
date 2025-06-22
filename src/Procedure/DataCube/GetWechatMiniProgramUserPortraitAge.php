@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Procedure\DataCube;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -37,11 +37,11 @@ class GetWechatMiniProgramUserPortraitAge extends CacheableProcedure
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if (!$account) {
+        if ($account === null) {
             throw new ApiException('找不到小程序');
         }
 
-        $now = Carbon::now();
+        $now = CarbonImmutable::now();
         $end = $now->clone()->subDay()->endOfDay();
         $start = match ($this->day) {
             1 => $now->clone()->subDay()->startOfDay(),

@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Procedure;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -35,63 +35,63 @@ class GetWechatMiniProgramRetainUserByDate extends CacheableProcedure
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if (!$account) {
+        if ($account === null) {
             throw new ApiException('找不到小程序');
         }
 
         $visitUv = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->startOfDay(),
             'type' => 'visit_uv',
         ]);
 
         $visitUvNew = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->startOfDay(),
             'type' => 'visit_uv_new',
         ]);
 
         $beforeVisitUv = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->subDay()->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->subDay()->startOfDay(),
             'type' => 'visit_uv',
         ]);
 
         $beforeVisitUvNew = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->subDay()->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->subDay()->startOfDay(),
             'type' => 'visit_uv_new',
         ]);
 
         $beforeSevenVisitUv = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->subDays(7)->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->subDays(7)->startOfDay(),
             'type' => 'visit_uv',
         ]);
 
         $beforeSevenVisitUvNew = $this->repository->findOneBy([
             'account' => $account,
-            'date' => Carbon::parse($this->date)->subDays(7)->startOfDay(),
+            'date' => CarbonImmutable::parse($this->date)->subDays(7)->startOfDay(),
             'type' => 'visit_uv_new',
         ]);
 
         $res = [
-            'visitUv' => $visitUv ? $visitUv->getUserNumber() : 0,  // 活跃用户留存
-            'visitUvNew' => $visitUvNew ? $visitUvNew->getUserNumber() : 0, // 新增用户留存
+            'visitUv' => ($visitUv !== null) ? $visitUv->getUserNumber() : 0,  // 活跃用户留存
+            'visitUvNew' => ($visitUvNew !== null) ? $visitUvNew->getUserNumber() : 0, // 新增用户留存
         ];
 
         return [
             ...$res,
-            'visitUvCompare' => $beforeVisitUv && $beforeVisitUv->getUserNumber() ? round(($res['visitUv'] - (int) $beforeVisitUv->getUserNumber()) / (int) $beforeVisitUv->getUserNumber(), 4) : null,
-            'visitUvNewCompare' => $beforeVisitUvNew && $beforeVisitUvNew->getUserNumber() ? round(($res['visitUvNew'] - (int) $beforeVisitUvNew->getUserNumber()) / (int) $beforeVisitUvNew->getUserNumber(), 4) : null,
-            'visitUvSevenCompare' => $beforeSevenVisitUv && $beforeSevenVisitUv->getUserNumber() ? round(($res['visitUv'] - (int) $beforeSevenVisitUv->getUserNumber()) / (int) $beforeSevenVisitUv->getUserNumber(), 4) : null,
-            'visitUvNewSevenCompare' => $beforeSevenVisitUvNew && $beforeSevenVisitUvNew->getUserNumber() ? round(($res['visitUvNew'] - (int) $beforeSevenVisitUvNew->getUserNumber()) / (int) $beforeSevenVisitUvNew->getUserNumber(), 4) : null,
+            'visitUvCompare' => ($beforeVisitUv !== null && $beforeVisitUv->getUserNumber() !== null) ? round(($res['visitUv'] - (int) $beforeVisitUv->getUserNumber()) / (int) $beforeVisitUv->getUserNumber(), 4) : null,
+            'visitUvNewCompare' => ($beforeVisitUvNew !== null && $beforeVisitUvNew->getUserNumber() !== null) ? round(($res['visitUvNew'] - (int) $beforeVisitUvNew->getUserNumber()) / (int) $beforeVisitUvNew->getUserNumber(), 4) : null,
+            'visitUvSevenCompare' => ($beforeSevenVisitUv !== null && $beforeSevenVisitUv->getUserNumber() !== null) ? round(($res['visitUv'] - (int) $beforeSevenVisitUv->getUserNumber()) / (int) $beforeSevenVisitUv->getUserNumber(), 4) : null,
+            'visitUvNewSevenCompare' => ($beforeSevenVisitUvNew !== null && $beforeSevenVisitUvNew->getUserNumber() !== null) ? round(($res['visitUvNew'] - (int) $beforeSevenVisitUvNew->getUserNumber()) / (int) $beforeSevenVisitUvNew->getUserNumber(), 4) : null,
         ];
     }
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramRetainUserByDate_{$request->getParams()->get('accountId')}_" . Carbon::parse($request->getParams()->get('date'))->startOfDay();
+        return "GetWechatMiniProgramRetainUserByDate_{$request->getParams()->get('accountId')}_" . CarbonImmutable::parse($request->getParams()->get('date'))->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int

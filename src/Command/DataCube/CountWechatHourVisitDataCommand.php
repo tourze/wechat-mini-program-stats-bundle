@@ -11,9 +11,10 @@ use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 
 #[AsCronTask('46 * * * *')]
 #[AsCronTask('13 * * * *')]
-#[AsCommand(name: 'wechat-mini-program:CountWechatHourVisitData', description: '统计小程序每小时访问情况')]
+#[AsCommand(name: self::NAME, description: '统计小程序每小时访问情况')]
 class CountWechatHourVisitDataCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:count-wechat-hour-visit-data';
 //    public function __construct(
 //        private readonly AccountRepository $accountRepository,
 //        private readonly HourVisitDataRepository $wechatHourVisitDataRepository,
@@ -24,11 +25,11 @@ class CountWechatHourVisitDataCommand extends LockableCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-//        $start = Carbon::now()->startOfHour();
-//        $end = Carbon::now()->endOfHour();
+//        $start = CarbonImmutable::now()->startOfHour();
+//        $end = CarbonImmutable::now()->endOfHour();
 //
-//        //        $start = Carbon::parse('2023-08-16 10:33:11')->startOfHour();
-//        //        $end = Carbon::parse('2023-08-16 10:33:11')->endOfHour();
+//        //        $start = CarbonImmutable::parse('2023-08-16 10:33:11')->startOfHour();
+//        //        $end = CarbonImmutable::parse('2023-08-16 10:33:11')->endOfHour();
 //
 //        $account = $this->accountRepository->findOneBy(['valid' => true]);
 ////        $data = $this->logRepository->createQueryBuilder('l')

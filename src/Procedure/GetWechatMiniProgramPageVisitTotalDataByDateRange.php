@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Procedure;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -38,18 +38,18 @@ class GetWechatMiniProgramPageVisitTotalDataByDateRange extends CacheableProcedu
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if (!$account) {
+        if ($account === null) {
             throw new ApiException('找不到小程序');
         }
 
-        $date = Carbon::parse($this->endDate)->startOfDay();
+        $date = CarbonImmutable::parse($this->endDate)->startOfDay();
         $list = [];
-        while ($date->gt(Carbon::parse($this->startDate))) {
+        while ($date->gt(CarbonImmutable::parse($this->startDate))) {
             $row = $this->pageDataRepository->createQueryBuilder('p')
                 ->select('sum(p.pageVisitPv)')
                 ->where('p.account = :account and p.date = :date')
                 ->setParameter('account', $account)
-                ->setParameter('date', Carbon::parse($date)->startOfDay())
+                ->setParameter('date', CarbonImmutable::parse($date)->startOfDay())
                 ->getQuery()
                 ->getSingleScalarResult();
             if ($row < 1) {
@@ -68,7 +68,7 @@ class GetWechatMiniProgramPageVisitTotalDataByDateRange extends CacheableProcedu
     public function getCacheKey(JsonRpcRequest $request): string
     {
         return "GetWechatMiniProgramPageVisitTotalDataByDateRange_{$request->getParams()->get('accountId')}_" .
-            Carbon::parse($request->getParams()->get('startDate'))->startOfDay() . '_' . Carbon::parse($request->getParams()->get('endDate'))->startOfDay();
+            CarbonImmutable::parse($request->getParams()->get('startDate'))->startOfDay() . '_' . CarbonImmutable::parse($request->getParams()->get('endDate'))->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int

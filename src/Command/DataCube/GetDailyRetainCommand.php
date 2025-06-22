@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command\DataCube;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -26,9 +26,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailyRetainRequest;
 #[AsCronTask('0 12 * * *')]
 #[AsCronTask('0 15 * * *')]
 #[AsCronTask('0 20 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetDailyRetainCommand', description: '获取用户访问小程序日留存')]
+#[AsCommand(name: self::NAME, description: '获取用户访问小程序日留存')]
 class GetDailyRetainCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:get-daily-retain';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailyRetainDataRepository $logRepository,
@@ -44,8 +45,8 @@ class GetDailyRetainCommand extends LockableCommand
         foreach ($this->accountRepository->findBy(['valid' => true]) as $account) {
             $request = new GetDailyRetainRequest();
             $request->setAccount($account);
-            $request->setBeginDate(Carbon::now()->subDays());
-            $request->setEndDate(Carbon::now()->subDays());
+            $request->setBeginDate(CarbonImmutable::now()->subDays());
+            $request->setEndDate(CarbonImmutable::now()->subDays());
 
             try {
                 $res = $this->client->request($request);
@@ -59,14 +60,14 @@ class GetDailyRetainCommand extends LockableCommand
             if ((bool) isset($res['visit_uv_new'])) {
                 foreach ($res['visit_uv_new'] as $value) {
                     $log = $this->logRepository->findOneBy([
-                        'date' => Carbon::parse($res['ref_date']),
+                        'date' => CarbonImmutable::parse($res['ref_date']),
                         'account' => $account,
                         'type' => 'visit_uv_new',
                     ]);
-                    if (!$log) {
+                    if ($log === null) {
                         $log = new DailyRetainData();
                         $log->setAccount($account);
-                        $log->setDate(Carbon::parse($res['ref_date']));
+                        $log->setDate(CarbonImmutable::parse($res['ref_date']));
                         $log->setType('visit_uv_new');
                     }
                     $log->setUserNumber($value['value']);
@@ -78,14 +79,14 @@ class GetDailyRetainCommand extends LockableCommand
             if ((bool) isset($res['visit_uv'])) {
                 foreach ($res['visit_uv'] as $value) {
                     $log = $this->logRepository->findOneBy([
-                        'date' => Carbon::parse($res['ref_date']),
+                        'date' => CarbonImmutable::parse($res['ref_date']),
                         'account' => $account,
                         'type' => 'visit_uv',
                     ]);
-                    if (!$log) {
+                    if ($log === null) {
                         $log = new DailyRetainData();
                         $log->setAccount($account);
-                        $log->setDate(Carbon::parse($res['ref_date']));
+                        $log->setDate(CarbonImmutable::parse($res['ref_date']));
                         $log->setType('visit_uv');
                     }
                     $log->setUserNumber($value['value']);

@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Procedure\DataCube;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodParam;
@@ -38,13 +38,13 @@ class GetWechatMiniProgramUserPortraitGenderByDateRange extends CacheableProcedu
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if (!$account) {
+        if ($account === null) {
             throw new ApiException('找不到小程序');
         }
 
         $dateArr = [];
-        $date = Carbon::parse($this->startDate);
-        while ($date->lte(Carbon::parse($this->endDate))) {
+        $date = CarbonImmutable::parse($this->startDate);
+        while ($date->lte(CarbonImmutable::parse($this->endDate))) {
             $dateArr[] = $date->format('Ymd');
             $date = $date->addDay();
         }
@@ -94,7 +94,7 @@ class GetWechatMiniProgramUserPortraitGenderByDateRange extends CacheableProcedu
     public function getCacheKey(JsonRpcRequest $request): string
     {
         return "GetWechatMiniProgramUserPortraitGenderByDateRange_{$request->getParams()->get('accountId')}_" .
-            Carbon::parse($request->getParams()->get('startDate'))->startOfDay() . '_' . Carbon::parse($request->getParams()->get('endDate'))->startOfDay();
+            CarbonImmutable::parse($request->getParams()->get('startDate'))->startOfDay() . '_' . CarbonImmutable::parse($request->getParams()->get('endDate'))->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int

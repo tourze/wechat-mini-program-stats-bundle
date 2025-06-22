@@ -2,7 +2,6 @@
 
 namespace WechatMiniProgramStatsBundle\Command\DataCube;
 
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,9 +21,10 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetVisitPageRequest;
  */
 #[AsCronTask('2 4 * * *')]
 #[AsCronTask('38 23 * * *')]
-#[AsCommand(name: 'wechat-mini-program:GetWechatUserAccessPageDataCommand', description: '获取用户访问页面数据')]
+#[AsCommand(name: self::NAME, description: '获取用户访问页面数据')]
 class GetWechatUserAccessPageDataCommand extends LockableCommand
 {
+    public const NAME = 'wechat-mini-program:get-wechat-user-access-page-data';
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly Client $client,
@@ -67,7 +67,7 @@ class GetWechatUserAccessPageDataCommand extends LockableCommand
                 // 入库
                 foreach ($res['list'] as $value) {
                     $log = new UserAccessPageData();
-                    $log->setDate(Carbon::parse($res['ref_date']));
+                    $log->setDate(CarbonImmutable::parse($res['ref_date']));
                     $log->setAccount($account);
                     $log->setPagePath($value['page_path']);
                     $log->setPageVisitPv($value['page_visit_pv']);

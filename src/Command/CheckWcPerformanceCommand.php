@@ -2,7 +2,7 @@
 
 namespace WechatMiniProgramStatsBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,11 +22,11 @@ use WechatMiniProgramStatsBundle\Repository\PerformanceRepository;
 use WechatMiniProgramStatsBundle\Request\DataAnalysis\WechatPerformanceRequest;
 
 #[AsCronTask('15 */8 * * *')]
-#[AsCommand(name: 'wechat-mini-program:check-performance', description: '定期查询小程序性能指标')]
+#[AsCommand(name: self::NAME, description: '定期查询小程序性能指标')]
 class CheckWcPerformanceCommand extends Command
 {
-    
     public const NAME = 'wechat-mini-program:check-performance';
+    
 public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly Client $client,
@@ -41,8 +41,8 @@ public function __construct(
     protected function configure(): void
     {
         $this->setDescription('定期查询小程序性能指标')
-            ->addArgument('startTime', InputArgument::OPTIONAL, 'start time', Carbon::now()->subHours(6)->getTimestamp())
-            ->addArgument('endTime', InputArgument::OPTIONAL, 'end time', Carbon::now()->getTimestamp());
+            ->addArgument('startTime', InputArgument::OPTIONAL, 'start time', CarbonImmutable::now()->subHours(6)->getTimestamp())
+            ->addArgument('endTime', InputArgument::OPTIONAL, 'end time', CarbonImmutable::now()->getTimestamp());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -110,7 +110,7 @@ public function __construct(
                 'nameZh' => $table['zh'],
                 'module' => $module,
             ]);
-            if (!$performance) {
+            if ($performance === null) {
                 $performance = new Performance();
                 $performance->setAccount($account);
                 $performance->setName($table['id']);
@@ -125,7 +125,7 @@ public function __construct(
                         'name' => $field['refdate'],
                         'performance' => $performance,
                     ]);
-                    if (!$attribute) {
+                    if ($attribute === null) {
                         $attribute = new PerformanceAttribute();
                         $attribute->setName($field['refdate']);
                         $attribute->setPerformance($performance);
