@@ -23,7 +23,7 @@ class DailyPageVisitData implements AdminArrayInterface
         return $this->id;
     }
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '日期'])]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '日期'])]
     private ?\DateTimeInterface $date = null;
 
     private string $page;

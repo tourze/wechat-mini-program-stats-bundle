@@ -14,19 +14,19 @@ use Tourze\JsonRPCCacheBundle\Procedure\CacheableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序指定时间段内的日趋势累计数据')]
-#[MethodExpose('GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange')]
-#[WithMonologChannel('procedure')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序指定时间段内的日趋势累计数据')]
+#[MethodExpose(method: 'GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange')]
+#[WithMonologChannel(channel: 'procedure')]
 class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('开始日期')]
+    #[MethodParam(description: '开始日期')]
     public string $startDate = '';
 
-    #[MethodParam('结束日期')]
+    #[MethodParam(description: '结束日期')]
     public string $endDate = '';
 
     public function __construct(

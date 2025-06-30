@@ -20,8 +20,8 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetWechatMiniUserAccessesWeekD
 /**
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/visit-retain/getWeeklyRetain.html
  */
-#[AsCronTask('33 21 * * *')]
-#[AsCronTask('37 22 * * *')]
+#[AsCronTask(expression: '33 21 * * *')]
+#[AsCronTask(expression: '37 22 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序周留存')]
 class GetUserAccessesWeekDataCommand extends LockableCommand
 {

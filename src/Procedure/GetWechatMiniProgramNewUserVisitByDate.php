@@ -16,15 +16,15 @@ use WechatMiniProgramStatsBundle\Entity\DailyNewUserVisitPv;
 use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取新用户访问小程序次数')]
-#[MethodExpose('GetWechatMiniProgramNewUserVisitByDate')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取新用户访问小程序次数')]
+#[MethodExpose(method: 'GetWechatMiniProgramNewUserVisitByDate')]
 class GetWechatMiniProgramNewUserVisitByDate extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('日期')]
+    #[MethodParam(description: '日期')]
     public string $date = '';
 
     public function __construct(

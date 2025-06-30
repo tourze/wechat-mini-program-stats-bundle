@@ -20,16 +20,16 @@ use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
  * 人均打开次数=总访问次数/总访问人数
  */
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序人均打开次数')]
-#[MethodExpose('GetWechatMiniProgramVisitUvAverage')]
-#[WithMonologChannel('procedure')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序人均打开次数')]
+#[MethodExpose(method: 'GetWechatMiniProgramVisitUvAverage')]
+#[WithMonologChannel(channel: 'procedure')]
 class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('天')]
+    #[MethodParam(description: '天')]
     public string $day = '';
 
     public function __construct(

@@ -5,7 +5,7 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitGendersDataRepository;
@@ -15,13 +15,9 @@ use WechatMiniProgramStatsBundle\Repository\UserPortraitGendersDataRepository;
 #[ORM\UniqueConstraint(name: 'wechat_user_access_portrait_genders_data_uniq', columns: ['date', 'type', 'account_id', 'name'])]
 class UserPortraitGendersData implements AdminArrayInterface
 , \Stringable{
+    use SnowflakeKeyAware;
     use CreateTimeAware;
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
@@ -37,10 +33,6 @@ class UserPortraitGendersData implements AdminArrayInterface
 
     private ?string $valueId = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getValueId(): ?string
     {

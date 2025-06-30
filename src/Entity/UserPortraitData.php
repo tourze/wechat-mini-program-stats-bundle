@@ -5,7 +5,7 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitDataRepository;
@@ -15,13 +15,9 @@ use WechatMiniProgramStatsBundle\Repository\UserPortraitDataRepository;
 #[ORM\UniqueConstraint(name: 'wechat_user_access_portrait_data_uniq', columns: ['date', 'name', 'account_id', 'type'])]
 class UserPortraitData implements AdminArrayInterface
 , \Stringable{
+    use SnowflakeKeyAware;
     use CreateTimeAware;
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
@@ -43,10 +39,6 @@ class UserPortraitData implements AdminArrayInterface
 
     private ?string $value = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }//    //    #[ORM\Column(length: 100, options: ['comment' => '省份'])]
     //    private ?string $city = null;
     //
     //    //    #[ORM\Column(length: 100, options: ['comment' => '城市'])]

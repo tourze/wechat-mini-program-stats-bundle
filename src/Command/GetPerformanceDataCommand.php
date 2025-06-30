@@ -20,8 +20,8 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetPerformanceDataRequest;
 /**
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/others/getPerformanceData.html
  */
-#[AsCronTask('55 22 * * *')]
-#[AsCronTask('54 23 * * *')]
+#[AsCronTask(expression: '55 22 * * *')]
+#[AsCronTask(expression: '54 23 * * *')]
 #[AsCommand(name: self::NAME, description: '获取小程序性能数据')]
 class GetPerformanceDataCommand extends LockableCommand
 {

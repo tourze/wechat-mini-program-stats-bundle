@@ -20,12 +20,12 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailyRetainRequest;
 /**
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/visit-retain/getDailyRetain.html
  */
-#[AsCronTask('0 8 * * *')]
-#[AsCronTask('0 9 * * *')]
-#[AsCronTask('0 10 * * *')]
-#[AsCronTask('0 12 * * *')]
-#[AsCronTask('0 15 * * *')]
-#[AsCronTask('0 20 * * *')]
+#[AsCronTask(expression: '0 8 * * *')]
+#[AsCronTask(expression: '0 9 * * *')]
+#[AsCronTask(expression: '0 10 * * *')]
+#[AsCronTask(expression: '0 12 * * *')]
+#[AsCronTask(expression: '0 15 * * *')]
+#[AsCronTask(expression: '0 20 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序日留存')]
 class GetDailyRetainCommand extends LockableCommand
 {

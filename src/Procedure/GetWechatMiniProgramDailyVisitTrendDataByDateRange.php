@@ -15,18 +15,18 @@ use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序指定时间段内的日趋势数据')]
-#[MethodExpose('GetWechatMiniProgramDailyVisitTrendDataByDateRange')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序指定时间段内的日趋势数据')]
+#[MethodExpose(method: 'GetWechatMiniProgramDailyVisitTrendDataByDateRange')]
 class GetWechatMiniProgramDailyVisitTrendDataByDateRange extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('开始日期')]
+    #[MethodParam(description: '开始日期')]
     public string $startDate = '';
 
-    #[MethodParam('结束日期')]
+    #[MethodParam(description: '结束日期')]
     public string $endDate = '';
 
     public function __construct(

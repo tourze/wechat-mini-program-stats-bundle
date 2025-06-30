@@ -30,6 +30,7 @@ class OperationPerformance implements AdminArrayInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '日期'])]
     private ?\DateTimeInterface $date = null;
 
     private ?string $costTimeType = null;

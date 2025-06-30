@@ -26,8 +26,8 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetVisitDistriButionRequest;
 /**
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/others/getVisitDistribution.html
  */
-#[AsCronTask('34 21 * * *')]
-#[AsCronTask('38 22 * * *')]
+#[AsCronTask(expression: '34 21 * * *')]
+#[AsCronTask(expression: '38 22 * * *')]
 #[AsCommand(name: self::NAME, description: '获取小程序访问分布数据')]
 class GetVisitDistributionCommand extends LockableCommand
 {

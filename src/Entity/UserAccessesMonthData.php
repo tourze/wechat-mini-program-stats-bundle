@@ -5,7 +5,7 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserAccessesMonthDataRepository;
@@ -15,13 +15,9 @@ use WechatMiniProgramStatsBundle\Repository\UserAccessesMonthDataRepository;
 #[ORM\UniqueConstraint(name: 'wechat_mini_program_user_accesses_month_data_uniq', columns: ['date', 'account_id', 'type'])]
 class UserAccessesMonthData implements AdminArrayInterface
 , \Stringable{
+    use SnowflakeKeyAware;
     use CreateTimeAware;
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     private ?string $date = null;
 
@@ -35,10 +31,6 @@ class UserAccessesMonthData implements AdminArrayInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getType(): ?string
     {

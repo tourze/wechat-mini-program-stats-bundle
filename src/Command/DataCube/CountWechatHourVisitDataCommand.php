@@ -9,8 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Tourze\LockCommandBundle\Command\LockableCommand;
 use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 
-#[AsCronTask('46 * * * *')]
-#[AsCronTask('13 * * * *')]
+#[AsCronTask(expression: '46 * * * *')]
+#[AsCronTask(expression: '13 * * * *')]
 #[AsCommand(name: self::NAME, description: '统计小程序每小时访问情况')]
 class CountWechatHourVisitDataCommand extends LockableCommand
 {

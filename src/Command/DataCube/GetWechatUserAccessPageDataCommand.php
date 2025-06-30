@@ -19,8 +19,8 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetVisitPageRequest;
 /**
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/others/getVisitPage.html
  */
-#[AsCronTask('2 4 * * *')]
-#[AsCronTask('38 23 * * *')]
+#[AsCronTask(expression: '2 4 * * *')]
+#[AsCronTask(expression: '38 23 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户访问页面数据')]
 class GetWechatUserAccessPageDataCommand extends LockableCommand
 {

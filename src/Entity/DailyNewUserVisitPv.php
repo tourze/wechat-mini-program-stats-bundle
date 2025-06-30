@@ -5,7 +5,7 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
@@ -15,13 +15,9 @@ use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
 #[ORM\UniqueConstraint(name: 'wechat_daily_new_user_visit_pv_idx_uniq', columns: ['date', 'account_id'])]
 class DailyNewUserVisitPv implements AdminArrayInterface
 , \Stringable{
+    use SnowflakeKeyAware;
     use CreateTimeAware;
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     private \DateTimeInterface $date;
 
@@ -34,10 +30,6 @@ class DailyNewUserVisitPv implements AdminArrayInterface
     #[ORM\ManyToOne]
     private ?Account $account = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getRemark(): ?string
     {

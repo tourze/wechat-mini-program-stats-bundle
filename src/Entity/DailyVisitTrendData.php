@@ -6,7 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\Arrayable\ApiArrayInterface;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
@@ -16,14 +16,11 @@ use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 #[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'account_id'])]
 class DailyVisitTrendData implements ApiArrayInterface, AdminArrayInterface
 , \Stringable{
+    use SnowflakeKeyAware;
     use CreateTimeAware;
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '日期'])]
     private ?\DateTimeInterface $date = null;
 
     private ?int $sessionCnt = 0;
@@ -44,10 +41,6 @@ class DailyVisitTrendData implements ApiArrayInterface, AdminArrayInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getVisitUvNew(): ?int
     {

@@ -21,7 +21,7 @@ use WechatMiniProgramStatsBundle\Repository\PerformanceAttributeRepository;
 use WechatMiniProgramStatsBundle\Repository\PerformanceRepository;
 use WechatMiniProgramStatsBundle\Request\DataAnalysis\WechatPerformanceRequest;
 
-#[AsCronTask('15 */8 * * *')]
+#[AsCronTask(expression: '15 */8 * * *')]
 #[AsCommand(name: self::NAME, description: '定期查询小程序性能指标')]
 class CheckWcPerformanceCommand extends Command
 {

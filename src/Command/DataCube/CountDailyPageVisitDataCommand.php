@@ -13,8 +13,8 @@ use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 use WechatMiniProgramStatsBundle\Entity\DailyPageVisitData;
 use WechatMiniProgramStatsBundle\Repository\DailyPageVisitDataRepository;
 
-#[AsCronTask('34 2 * * *')]
-#[AsCronTask('28 4 * * *')]
+#[AsCronTask(expression: '34 2 * * *')]
+#[AsCronTask(expression: '28 4 * * *')]
 #[AsCommand(name: self::NAME, description: '统计每日页面访问情况')]
 class CountDailyPageVisitDataCommand extends LockableCommand
 {

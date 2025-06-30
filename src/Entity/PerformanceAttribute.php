@@ -26,10 +26,10 @@ class PerformanceAttribute implements AdminArrayInterface
         return $this->id;
     }
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     private ?string $name = null;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     private ?string $value = null;
 
     #[Ignore]

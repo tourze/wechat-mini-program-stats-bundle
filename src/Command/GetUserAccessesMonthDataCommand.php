@@ -21,8 +21,8 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetWechatMiniUserAccessesMonth
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/visit-retain/getWeeklyRetain.html
  */
 // 每个月1号执行
-#[AsCronTask('44 22 * * *')]
-#[AsCronTask('47 23 * * *')]
+#[AsCronTask(expression: '44 22 * * *')]
+#[AsCronTask(expression: '47 23 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序月留存')]
 class GetUserAccessesMonthDataCommand extends LockableCommand
 {

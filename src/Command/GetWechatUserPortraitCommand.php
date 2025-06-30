@@ -15,8 +15,8 @@ use WechatMiniProgramStatsBundle\Service\WechatUserPortraitService;
 /**
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/others/getUserPortrait.html
  */
-#[AsCronTask('1 12 * * *')]
-#[AsCronTask('6 21 * * *')]
+#[AsCronTask(expression: '1 12 * * *')]
+#[AsCronTask(expression: '6 21 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户用户画像分布')]
 class GetWechatUserPortraitCommand extends LockableCommand
 {

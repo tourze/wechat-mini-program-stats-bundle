@@ -15,15 +15,15 @@ use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Repository\DailyRetainDataRepository;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序留存用户')]
-#[MethodExpose('GetWechatMiniProgramRetainUserByDate')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序留存用户')]
+#[MethodExpose(method: 'GetWechatMiniProgramRetainUserByDate')]
 class GetWechatMiniProgramRetainUserByDate extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('日期')]
+    #[MethodParam(description: '日期')]
     public string $date = '';
 
     public function __construct(

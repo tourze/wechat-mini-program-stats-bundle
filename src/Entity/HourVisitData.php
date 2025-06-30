@@ -5,7 +5,7 @@ namespace WechatMiniProgramStatsBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\Arrayable\AdminArrayInterface;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\HourVisitDataRepository;
@@ -15,13 +15,9 @@ use WechatMiniProgramStatsBundle\Repository\HourVisitDataRepository;
 #[ORM\UniqueConstraint(name: 'wechat_hour_visit_data_idx_uniq', columns: ['date', 'account_id'])]
 class HourVisitData implements AdminArrayInterface
 , \Stringable{
+    use SnowflakeKeyAware;
     use TimestampableAware;
 
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     private \DateTimeInterface $date;
 
@@ -41,10 +37,6 @@ class HourVisitData implements AdminArrayInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getVisitUserUv(): ?int
     {

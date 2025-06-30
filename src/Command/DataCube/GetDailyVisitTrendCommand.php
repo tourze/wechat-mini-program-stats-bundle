@@ -21,7 +21,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailyVisitTrendRequest;
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/visit-trend/getDailyVisitTrend.html
  */
 // 每天0点跑
-#[AsCronTask('5 */6 * * *')]
+#[AsCronTask(expression: '5 */6 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序数据日趋势')]
 class GetDailyVisitTrendCommand extends LockableCommand
 {

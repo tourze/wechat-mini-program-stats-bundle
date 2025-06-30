@@ -20,7 +20,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetWeeklyVisitTrendRequest;
 /**
  * @see https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/visit-trend/getWeeklyVisitTrend.html
  */
-#[AsCronTask('10 */6 * * *')]
+#[AsCronTask(expression: '10 */6 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序数据周趋势')]
 class GetWeeklyVisitTrendCommand extends LockableCommand
 {

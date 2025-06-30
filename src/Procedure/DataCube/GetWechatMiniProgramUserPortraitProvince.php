@@ -16,15 +16,15 @@ use WechatMiniProgramStatsBundle\Repository\UserPortraitProvinceDataRepository;
 use WechatMiniProgramStatsBundle\Service\WechatUserPortraitService;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序用户画像-省份')]
-#[MethodExpose('GetWechatMiniProgramUserPortraitProvince')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序用户画像-省份')]
+#[MethodExpose(method: 'GetWechatMiniProgramUserPortraitProvince')]
 class GetWechatMiniProgramUserPortraitProvince extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('天，时间范围支持昨天1、最近7天、最近30天')]
+    #[MethodParam(description: '天，时间范围支持昨天1、最近7天、最近30天')]
     public int $day = 1;
 
     public function __construct(

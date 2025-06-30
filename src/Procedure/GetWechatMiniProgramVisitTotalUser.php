@@ -14,12 +14,12 @@ use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Repository\DailySummaryDataRepository;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序累计用户数')]
-#[MethodExpose('GetWechatMiniProgramVisitTotalUser')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序累计用户数')]
+#[MethodExpose(method: 'GetWechatMiniProgramVisitTotalUser')]
 class GetWechatMiniProgramVisitTotalUser extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
     public function __construct(

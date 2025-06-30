@@ -14,8 +14,8 @@ use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Entity\DailyNewUserVisitPv;
 use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
 
-#[AsCronTask('50 2 * * *')]
-#[AsCronTask('28 5 * * *')]
+#[AsCronTask(expression: '50 2 * * *')]
+#[AsCronTask(expression: '28 5 * * *')]
 #[AsCommand(name: self::NAME, description: '新用户访问小程序次数')]
 class CountDailyNewUserVisitDataCommand extends LockableCommand
 {

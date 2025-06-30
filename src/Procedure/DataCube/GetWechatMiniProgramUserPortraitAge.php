@@ -16,15 +16,15 @@ use WechatMiniProgramStatsBundle\Repository\UserPortraitAgeDataRepository;
 use WechatMiniProgramStatsBundle\Service\WechatUserPortraitService;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序用户画像-年龄')]
-#[MethodExpose('GetWechatMiniProgramUserPortraitAge')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序用户画像-年龄')]
+#[MethodExpose(method: 'GetWechatMiniProgramUserPortraitAge')]
 class GetWechatMiniProgramUserPortraitAge extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('天，时间范围支持昨天1、最近7天、最近30天')]
+    #[MethodParam(description: '天，时间范围支持昨天1、最近7天、最近30天')]
     public int $day = 1;
 
     public function __construct(

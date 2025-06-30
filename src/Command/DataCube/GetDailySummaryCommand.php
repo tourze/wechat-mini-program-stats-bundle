@@ -19,8 +19,8 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailySummaryRequest;
 /**
  * link https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/data-analysis/others/getDailySummary.html
  */
-#[AsCronTask('4 2 * * *')]
-#[AsCronTask('11 5 * * *')]
+#[AsCronTask(expression: '4 2 * * *')]
+#[AsCronTask(expression: '11 5 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序数据概况')]
 class GetDailySummaryCommand extends Command
 {

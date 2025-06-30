@@ -15,15 +15,15 @@ use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Repository\UserAccessPageDataRepository;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序指定日期的页面访问总数')]
-#[MethodExpose('GetWechatMiniProgramPageVisitTotalDataByDate')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序指定日期的页面访问总数')]
+#[MethodExpose(method: 'GetWechatMiniProgramPageVisitTotalDataByDate')]
 class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('日期')]
+    #[MethodParam(description: '日期')]
     public string $date = '';
 
     public function __construct(

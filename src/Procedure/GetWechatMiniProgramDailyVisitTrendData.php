@@ -18,16 +18,16 @@ use WechatMiniProgramStatsBundle\Entity\DailyVisitTrendData;
 use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 
 #[Log]
-#[MethodTag('微信小程序')]
-#[MethodDoc('获取用户访问小程序数据日趋势')]
-#[MethodExpose('GetWechatMiniProgramDailyVisitTrendData')]
-#[WithMonologChannel('procedure')]
+#[MethodTag(name: '微信小程序')]
+#[MethodDoc(summary: '获取用户访问小程序数据日趋势')]
+#[MethodExpose(method: 'GetWechatMiniProgramDailyVisitTrendData')]
+#[WithMonologChannel(channel: 'procedure')]
 class GetWechatMiniProgramDailyVisitTrendData extends CacheableProcedure
 {
-    #[MethodParam('小程序ID')]
+    #[MethodParam(description: '小程序ID')]
     public string $accountId = '';
 
-    #[MethodParam('日期')]
+    #[MethodParam(description: '日期')]
     public string $date = '';
 
     public function __construct(
