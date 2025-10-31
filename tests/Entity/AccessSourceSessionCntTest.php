@@ -1,29 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Tests\Entity;
 
-use DateTimeImmutable;
-use PHPUnit\Framework\TestCase;
-use WechatMiniProgramBundle\Entity\Account;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use WechatMiniProgramStatsBundle\Entity\AccessSourceSessionCnt;
 
-class AccessSourceSessionCntTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(AccessSourceSessionCnt::class)]
+final class AccessSourceSessionCntTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new AccessSourceSessionCnt();
+    }
+
+    /**
+     * @return iterable<array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'id' => ['id', 'test_id'],
+            'createTime' => ['createTime', new \DateTimeImmutable()],
+        ];
+    }
+
     private AccessSourceSessionCnt $accessSourceSessionCnt;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->accessSourceSessionCnt = new AccessSourceSessionCnt();
     }
 
-    public function testId_initiallyNull(): void
+    public function testIdInitiallyNull(): void
     {
-        $this->assertNull($this->accessSourceSessionCnt->getId());
+        self::assertNull($this->accessSourceSessionCnt->getId());
     }
 
-    public function testToString_returnsIdAsString(): void
+    public function testToStringReturnsIdAsString(): void
     {
         $result = $this->accessSourceSessionCnt->__toString();
-        $this->assertSame('', $result); // ID is null initially
+        self::assertSame('', $result); // ID is null initially
     }
 }

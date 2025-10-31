@@ -1,131 +1,151 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Tests\Entity;
 
-use DateTimeImmutable;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitData;
 
-class UserPortraitDataTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(UserPortraitData::class)]
+final class UserPortraitDataTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new UserPortraitData();
+    }
+
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'id' => ['id', 'test_id'],
+            'createTime' => ['createTime', new \DateTimeImmutable()],
+        ];
+    }
+
     private UserPortraitData $userPortraitData;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->userPortraitData = new UserPortraitData();
     }
 
-    public function testId_initiallyNull(): void
+    public function testIdInitiallyNull(): void
     {
-        $this->assertNull($this->userPortraitData->getId());
+        self::assertNull($this->userPortraitData->getId());
     }
 
-    public function testCreateTime_getterAndSetter(): void
+    public function testCreateTimeGetterAndSetter(): void
     {
-        $now = new DateTimeImmutable();
-        $this->assertNull($this->userPortraitData->getCreateTime());
+        $now = new \DateTimeImmutable();
+        self::assertNull($this->userPortraitData->getCreateTime());
 
-        $result = $this->userPortraitData->setCreateTime($now);
+        $this->userPortraitData->setCreateTime($now);
 
-        $this->assertSame($now, $this->userPortraitData->getCreateTime());
-        $this->assertSame($this->userPortraitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($now, $this->userPortraitData->getCreateTime());
     }
 
-    public function testDate_getterAndSetter(): void
+    public function testDateGetterAndSetter(): void
     {
         $date = '20230101';
-        $this->assertNull($this->userPortraitData->getDate());
+        self::assertNull($this->userPortraitData->getDate());
 
-        $result = $this->userPortraitData->setDate($date);
+        $this->userPortraitData->setDate($date);
 
-        $this->assertSame($date, $this->userPortraitData->getDate());
-        $this->assertSame($this->userPortraitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($date, $this->userPortraitData->getDate());
     }
 
-    public function testType_getterAndSetter(): void
+    public function testTypeGetterAndSetter(): void
     {
         $type = 'visit_uv_new';
-        $this->assertNull($this->userPortraitData->getType());
+        self::assertNull($this->userPortraitData->getType());
 
         $this->userPortraitData->setType($type);
 
-        $this->assertSame($type, $this->userPortraitData->getType());
+        self::assertSame($type, $this->userPortraitData->getType());
     }
 
-    public function testBeginTime_getterAndSetter(): void
+    public function testBeginTimeGetterAndSetter(): void
     {
-        $now = new DateTimeImmutable();
-        $this->assertNull($this->userPortraitData->getBeginTime());
+        $now = new \DateTimeImmutable();
+        self::assertNull($this->userPortraitData->getBeginTime());
 
-        $result = $this->userPortraitData->setBeginTime($now);
+        $this->userPortraitData->setBeginTime($now);
 
-        $this->assertSame($now, $this->userPortraitData->getBeginTime());
-        $this->assertSame($this->userPortraitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($now, $this->userPortraitData->getBeginTime());
     }
 
-    public function testEndTime_getterAndSetter(): void
+    public function testEndTimeGetterAndSetter(): void
     {
-        $now = new DateTimeImmutable();
-        $this->assertNull($this->userPortraitData->getEndTime());
+        $now = new \DateTimeImmutable();
+        self::assertNull($this->userPortraitData->getEndTime());
 
-        $result = $this->userPortraitData->setEndTime($now);
+        $this->userPortraitData->setEndTime($now);
 
-        $this->assertSame($now, $this->userPortraitData->getEndTime());
-        $this->assertSame($this->userPortraitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($now, $this->userPortraitData->getEndTime());
     }
 
-    public function testUserType_getterAndSetter(): void
+    public function testUserTypeGetterAndSetter(): void
     {
         $userType = 'new_user';
-        $this->assertNull($this->userPortraitData->getUserType());
+        self::assertNull($this->userPortraitData->getUserType());
 
         $this->userPortraitData->setUserType($userType);
 
-        $this->assertSame($userType, $this->userPortraitData->getUserType());
+        self::assertSame($userType, $this->userPortraitData->getUserType());
     }
 
-    public function testProvince_getterAndSetter(): void
+    public function testProvinceGetterAndSetter(): void
     {
         $province = 'Beijing';
 
         $this->userPortraitData->setProvince($province);
 
-        $this->assertSame($province, $this->userPortraitData->getProvince());
+        self::assertSame($province, $this->userPortraitData->getProvince());
     }
 
-    public function testName_getterAndSetter(): void
+    public function testNameGetterAndSetter(): void
     {
         $name = 'TestName';
-        $this->assertNull($this->userPortraitData->getName());
+        self::assertNull($this->userPortraitData->getName());
 
         $this->userPortraitData->setName($name);
 
-        $this->assertSame($name, $this->userPortraitData->getName());
+        self::assertSame($name, $this->userPortraitData->getName());
     }
 
-    public function testValue_getterAndSetter(): void
+    public function testValueGetterAndSetter(): void
     {
         $value = '100';
-        $this->assertNull($this->userPortraitData->getValue());
+        self::assertNull($this->userPortraitData->getValue());
 
         $this->userPortraitData->setValue($value);
 
-        $this->assertSame($value, $this->userPortraitData->getValue());
+        self::assertSame($value, $this->userPortraitData->getValue());
     }
 
-    public function testAccount_getterAndSetter(): void
+    public function testAccountGetterAndSetter(): void
     {
+        // 必须使用具体类 Account 而不是接口的原因：
+        // 理由1：Account 是 Doctrine Entity 类，代表微信小程序账户实体，不存在相应的接口抽象
+        // 理由2：测试需要验证 UserPortraitData 实体正确管理其与 Account 的关联关系
+        // 理由3：使用 Mock 可以隔离外部依赖，专注于测试当前实体的行为，避免数据库交互
         $account = $this->createMock(Account::class);
-        $this->assertNull($this->userPortraitData->getAccount());
+        self::assertNull($this->userPortraitData->getAccount());
 
-        $result = $this->userPortraitData->setAccount($account);
+        $this->userPortraitData->setAccount($account);
 
-        $this->assertSame($account, $this->userPortraitData->getAccount());
-        $this->assertSame($this->userPortraitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($account, $this->userPortraitData->getAccount());
     }
 
-    public function testRetrieveAdminArray_returnsExpectedFormat(): void
+    public function testRetrieveAdminArrayReturnsExpectedFormat(): void
     {
         $date = '20230101';
         $type = 'visit_uv_new';
@@ -138,13 +158,13 @@ class UserPortraitDataTest extends TestCase
         $this->userPortraitData->setValue($value);
 
         $result = $this->userPortraitData->retrieveAdminArray();
-        $this->assertArrayHasKey('date', $result);
-        $this->assertArrayHasKey('type', $result);
-        $this->assertArrayHasKey('name', $result);
-        $this->assertArrayHasKey('value', $result);
-        $this->assertEquals($date, $result['date']);
-        $this->assertEquals($type, $result['type']);
-        $this->assertEquals($name, $result['name']);
-        $this->assertEquals($value, $result['value']);
+        self::assertArrayHasKey('date', $result);
+        self::assertArrayHasKey('type', $result);
+        self::assertArrayHasKey('name', $result);
+        self::assertArrayHasKey('value', $result);
+        self::assertEquals($date, $result['date']);
+        self::assertEquals($type, $result['type']);
+        self::assertEquals($name, $result['name']);
+        self::assertEquals($value, $result['value']);
     }
 }

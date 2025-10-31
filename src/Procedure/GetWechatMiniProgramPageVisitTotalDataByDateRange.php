@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Procedure;
 
 use Carbon\CarbonImmutable;
@@ -35,10 +37,13 @@ class GetWechatMiniProgramPageVisitTotalDataByDateRange extends CacheableProcedu
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if ($account === null) {
+        if (null === $account) {
             throw new ApiException('找不到小程序');
         }
 
@@ -51,7 +56,8 @@ class GetWechatMiniProgramPageVisitTotalDataByDateRange extends CacheableProcedu
                 ->setParameter('account', $account)
                 ->setParameter('date', CarbonImmutable::parse($date)->startOfDay())
                 ->getQuery()
-                ->getSingleScalarResult();
+                ->getSingleScalarResult()
+            ;
             if ($row < 1) {
                 continue;
             }
@@ -62,13 +68,30 @@ class GetWechatMiniProgramPageVisitTotalDataByDateRange extends CacheableProcedu
             $date = $date->subDay();
         }
 
-        return $list;
+        return ['data' => $list];
     }
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramPageVisitTotalDataByDateRange_{$request->getParams()->get('accountId')}_" .
-            CarbonImmutable::parse($request->getParams()->get('startDate'))->startOfDay() . '_' . CarbonImmutable::parse($request->getParams()->get('endDate'))->startOfDay();
+        $params = $request->getParams();
+        if (null === $params) {
+            return 'GetWechatMiniProgramPageVisitTotalDataByDateRange_default';
+        }
+
+        $accountId = $params->get('accountId') ?? 'unknown';
+        $startDate = $params->get('startDate');
+        $endDate = $params->get('endDate');
+
+        if (!is_string($accountId) && !is_numeric($accountId)) {
+            $accountId = 'unknown';
+        }
+
+        if (!is_string($startDate) || !is_string($endDate)) {
+            return "GetWechatMiniProgramPageVisitTotalDataByDateRange_{$accountId}_invalid_dates";
+        }
+
+        return "GetWechatMiniProgramPageVisitTotalDataByDateRange_{$accountId}_" .
+            CarbonImmutable::parse($startDate)->startOfDay() . '_' . CarbonImmutable::parse($endDate)->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int
@@ -76,8 +99,11 @@ class GetWechatMiniProgramPageVisitTotalDataByDateRange extends CacheableProcedu
         return 60 * 60;
     }
 
+    /**
+     * @return iterable<string>
+     */
     public function getCacheTags(JsonRpcRequest $request): iterable
     {
-        yield null;
+        yield 'wechat_stats';
     }
 }

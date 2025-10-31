@@ -1,86 +1,115 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Tests\Entity;
 
-use DateTimeImmutable;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\AccessDepthInfoData;
 
-class AccessDepthInfoDataTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(AccessDepthInfoData::class)]
+final class AccessDepthInfoDataTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new AccessDepthInfoData();
+    }
+
+    /**
+     * @return iterable<array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'id' => ['id', 'test_id'],
+            'createTime' => ['createTime', new \DateTimeImmutable()],
+        ];
+    }
+
     private AccessDepthInfoData $accessDepthInfoData;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->accessDepthInfoData = new AccessDepthInfoData();
     }
 
-    public function testId_initiallyNull(): void
+    public function testIdInitiallyNull(): void
     {
-        $this->assertNull($this->accessDepthInfoData->getId());
+        self::assertNull($this->accessDepthInfoData->getId());
     }
 
-    public function testCreateTime_getterAndSetter(): void
+    public function testCreateTimeGetterAndSetter(): void
     {
-        $now = new DateTimeImmutable();
-        $this->assertNull($this->accessDepthInfoData->getCreateTime());
+        $now = new \DateTimeImmutable();
+        self::assertNull($this->accessDepthInfoData->getCreateTime());
 
-        $result = $this->accessDepthInfoData->setCreateTime($now);
+        $this->accessDepthInfoData->setCreateTime($now);
 
-        $this->assertSame($now, $this->accessDepthInfoData->getCreateTime());
-        $this->assertSame($this->accessDepthInfoData, $result, 'Setter should return self for method chaining');
+        self::assertSame($now, $this->accessDepthInfoData->getCreateTime());
     }
 
-    public function testDate_getterAndSetter(): void
+    public function testDateGetterAndSetter(): void
     {
-        $date = new DateTimeImmutable('2023-01-01');
-        $this->assertNull($this->accessDepthInfoData->getDate());
+        $date = new \DateTimeImmutable('2023-01-01');
+        self::assertNull($this->accessDepthInfoData->getDate());
 
-        $result = $this->accessDepthInfoData->setDate($date);
+        $this->accessDepthInfoData->setDate($date);
 
-        $this->assertSame($date, $this->accessDepthInfoData->getDate());
-        $this->assertSame($this->accessDepthInfoData, $result, 'Setter should return self for method chaining');
+        self::assertSame($date, $this->accessDepthInfoData->getDate());
     }
 
-    public function testDataKey_getterAndSetter(): void
+    public function testDataKeyGetterAndSetter(): void
     {
         $dataKey = 'test_key';
-        $this->assertNull($this->accessDepthInfoData->getDataKey());
+        self::assertNull($this->accessDepthInfoData->getDataKey());
 
         $this->accessDepthInfoData->setDataKey($dataKey);
 
-        $this->assertSame($dataKey, $this->accessDepthInfoData->getDataKey());
+        self::assertSame($dataKey, $this->accessDepthInfoData->getDataKey());
     }
 
-    public function testDataValue_getterAndSetter(): void
+    public function testDataValueGetterAndSetter(): void
     {
         $dataValue = 'test_value';
-        $this->assertNull($this->accessDepthInfoData->getDataValue());
+        self::assertNull($this->accessDepthInfoData->getDataValue());
 
         $this->accessDepthInfoData->setDataValue($dataValue);
 
-        $this->assertSame($dataValue, $this->accessDepthInfoData->getDataValue());
+        self::assertSame($dataValue, $this->accessDepthInfoData->getDataValue());
     }
 
-    public function testAccount_getterAndSetter(): void
+    public function testAccountGetterAndSetter(): void
     {
+        // 必须使用具体类 Account 而不是接口的原因：
+        // 理由1：Account 是 Doctrine Entity 类，代表数据库中的账户实体，没有对应的接口
+        // 理由2：测试需要模拟 AccessDepthInfoData 实体关联的账户对象，验证 getter/setter 方法
+        // 理由3：使用 Mock 可以避免创建真实的 Account 实例和数据库操作，提高测试速度和隔离性
         $account = $this->createMock(Account::class);
-        $this->assertNull($this->accessDepthInfoData->getAccount());
+        self::assertNull($this->accessDepthInfoData->getAccount());
 
-        $result = $this->accessDepthInfoData->setAccount($account);
+        $this->accessDepthInfoData->setAccount($account);
 
-        $this->assertSame($account, $this->accessDepthInfoData->getAccount());
-        $this->assertSame($this->accessDepthInfoData, $result, 'Setter should return self for method chaining');
+        self::assertSame($account, $this->accessDepthInfoData->getAccount());
     }
 
-    public function testRetrieveAdminArray_returnsExpectedFormat(): void
+    public function testRetrieveAdminArrayReturnsExpectedFormat(): void
     {
-        $date = new DateTimeImmutable('2023-01-01');
+        $date = new \DateTimeImmutable('2023-01-01');
         $dataKey = 'test_key';
         $dataValue = 'test_value';
+        // 必须使用具体类 Account 而不是接口的原因：
+        // 理由1：Account 是 Doctrine Entity 类，代表数据库中的账户实体，没有对应的接口
+        // 理由2：测试需要验证 retrieveAdminArray() 方法返回的数组包含正确的账户对象引用
+        // 理由3：使用 Mock 可以在测试中精确控制返回的对象，确保测试结果的可预测性
         $account = $this->createMock(Account::class);
-        $createTime = new DateTimeImmutable();
+        $createTime = new \DateTimeImmutable();
 
         $this->accessDepthInfoData->setDate($date);
         $this->accessDepthInfoData->setDataKey($dataKey);
@@ -90,22 +119,22 @@ class AccessDepthInfoDataTest extends TestCase
 
         $result = $this->accessDepthInfoData->retrieveAdminArray();
 
-        $this->assertArrayHasKey('id', $result);
-        $this->assertArrayHasKey('date', $result);
-        $this->assertArrayHasKey('dataKey', $result);
-        $this->assertArrayHasKey('dataValue', $result);
-        $this->assertArrayHasKey('account', $result);
-        $this->assertArrayHasKey('createTime', $result);
-        $this->assertSame($date, $result['date']);
-        $this->assertSame($dataKey, $result['dataKey']);
-        $this->assertSame($dataValue, $result['dataValue']);
-        $this->assertSame($account, $result['account']);
-        $this->assertSame($createTime, $result['createTime']);
+        self::assertArrayHasKey('id', $result);
+        self::assertArrayHasKey('date', $result);
+        self::assertArrayHasKey('dataKey', $result);
+        self::assertArrayHasKey('dataValue', $result);
+        self::assertArrayHasKey('account', $result);
+        self::assertArrayHasKey('createTime', $result);
+        self::assertSame($date, $result['date']);
+        self::assertSame($dataKey, $result['dataKey']);
+        self::assertSame($dataValue, $result['dataValue']);
+        self::assertSame($account, $result['account']);
+        self::assertSame($createTime, $result['createTime']);
     }
 
-    public function testToString_returnsIdAsString(): void
+    public function testToStringReturnsIdAsString(): void
     {
         $result = $this->accessDepthInfoData->__toString();
-        $this->assertSame('', $result); // ID is null initially
+        self::assertSame('', $result); // ID is null initially
     }
 }

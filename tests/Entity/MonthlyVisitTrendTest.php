@@ -1,29 +1,53 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Tests\Entity;
 
-use DateTimeImmutable;
-use PHPUnit\Framework\TestCase;
-use WechatMiniProgramBundle\Entity\Account;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use WechatMiniProgramStatsBundle\Entity\MonthlyVisitTrend;
 
-class MonthlyVisitTrendTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(MonthlyVisitTrend::class)]
+final class MonthlyVisitTrendTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new MonthlyVisitTrend();
+    }
+
+    /**
+     * @return iterable<array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'sessionCnt' => ['sessionCnt', 'test_session_cnt'],
+            'visitPv' => ['visitPv', 'test_visit_pv'],
+            'visitUv' => ['visitUv', 'test_visit_uv'],
+        ];
+    }
+
     private MonthlyVisitTrend $monthlyVisitTrend;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->monthlyVisitTrend = new MonthlyVisitTrend();
     }
 
-    public function testId_initiallyNull(): void
+    public function testIdInitiallyNull(): void
     {
-        $this->assertEquals(0, $this->monthlyVisitTrend->getId());
+        self::assertEquals(0, $this->monthlyVisitTrend->getId());
     }
 
-    public function testToString_returnsIdAsString(): void
+    public function testToStringReturnsIdAsString(): void
     {
         $result = $this->monthlyVisitTrend->__toString();
-        $this->assertSame('0', $result); // ID is 0 initially
+        self::assertSame('0', $result); // ID is 0 initially
     }
 }

@@ -1,42 +1,61 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\HourVisitDataRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: HourVisitDataRepository::class)]
 #[ORM\Table(name: 'wechat_hour_visit_data', options: ['comment' => '小程序每小时访问数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_hour_visit_data_idx_uniq', columns: ['date', 'account_id'])]
-class HourVisitData implements AdminArrayInterface
-, \Stringable{
+class HourVisitData implements AdminArrayInterface, \Stringable
+{
     use SnowflakeKeyAware;
     use TimestampableAware;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '日期时间'])]
+    #[Assert\NotNull]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
+    private \DateTimeImmutable $date;
 
-    private \DateTimeInterface $date;
-
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '访问用户UV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $visitUserUv = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '访问用户PV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $visitUserPv = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '页面PV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $pagePv = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '新用户数', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $newUser = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '新用户访问PV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $visitNewUserPv = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '新用户页面PV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $pageNewUserPv = 0;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
-
 
     public function getVisitUserUv(): ?int
     {
@@ -48,14 +67,12 @@ class HourVisitData implements AdminArrayInterface
         $this->visitUserUv = $visitUserUv;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate(\DateTimeImmutable $date): void
     {
         $this->date = $date;
-
-        return $this;
     }
 
-    public function getDate(): \DateTimeInterface
+    public function getDate(): \DateTimeImmutable
     {
         return $this->date;
     }
@@ -65,13 +82,14 @@ class HourVisitData implements AdminArrayInterface
         return $this->account;
     }
 
-    public function setAccount(?Account $account): self
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [

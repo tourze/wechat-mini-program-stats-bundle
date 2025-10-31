@@ -1,29 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Enum\PerformanceModule;
 use WechatMiniProgramStatsBundle\Repository\PerformanceRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: PerformanceRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_performance', options: ['comment' => '微信小程序性能'])]
-class Performance implements AdminArrayInterface
-, \Stringable{
+class Performance implements AdminArrayInterface, \Stringable
+{
     use CreateTimeAware;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
-    private ?int $id = 0;
+    private int $id = 0;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -32,12 +38,21 @@ class Performance implements AdminArrayInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, enumType: PerformanceModule::class, options: ['comment' => '模块'])]
+    #[Assert\Choice(callback: [PerformanceModule::class, 'cases'])]
     private ?PerformanceModule $module = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '名称'])]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '中文名称'])]
+    #[Assert\Length(max: 255)]
     private ?string $nameZh = null;
 
+    /**
+     * @var Collection<int, PerformanceAttribute>
+     */
     #[ORM\OneToMany(mappedBy: 'performance', targetEntity: PerformanceAttribute::class)]
     private Collection $wechatPerformanceAttributes;
 
@@ -46,6 +61,9 @@ class Performance implements AdminArrayInterface
         $this->wechatPerformanceAttributes = new ArrayCollection();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [
@@ -64,11 +82,9 @@ class Performance implements AdminArrayInterface
         return $this->nameZh;
     }
 
-    public function setNameZh(string $nameZh): self
+    public function setNameZh(string $nameZh): void
     {
         $this->nameZh = $nameZh;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -76,11 +92,9 @@ class Performance implements AdminArrayInterface
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): void
     {
         $this->name = $name;
-
-        return $this;
     }
 
     public function getAccount(): ?Account
@@ -88,11 +102,9 @@ class Performance implements AdminArrayInterface
         return $this->account;
     }
 
-    public function setAccount(?Account $account): static
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
     public function getModule(): ?PerformanceModule
@@ -100,11 +112,9 @@ class Performance implements AdminArrayInterface
         return $this->module;
     }
 
-    public function setModule(PerformanceModule $module): self
+    public function setModule(PerformanceModule $module): void
     {
         $this->module = $module;
-
-        return $this;
     }
 
     /**
@@ -115,17 +125,15 @@ class Performance implements AdminArrayInterface
         return $this->wechatPerformanceAttributes;
     }
 
-    public function addWechatPerformanceAttribute(PerformanceAttribute $wechatPerformanceAttribute): static
+    public function addWechatPerformanceAttribute(PerformanceAttribute $wechatPerformanceAttribute): void
     {
         if (!$this->wechatPerformanceAttributes->contains($wechatPerformanceAttribute)) {
             $this->wechatPerformanceAttributes->add($wechatPerformanceAttribute);
             $wechatPerformanceAttribute->setPerformance($this);
         }
-
-        return $this;
     }
 
-    public function removeWechatPerformanceAttribute(PerformanceAttribute $wechatPerformanceAttribute): static
+    public function removeWechatPerformanceAttribute(PerformanceAttribute $wechatPerformanceAttribute): void
     {
         if ($this->wechatPerformanceAttributes->removeElement($wechatPerformanceAttribute)) {
             // set the owning side to null (unless already changed)
@@ -133,8 +141,6 @@ class Performance implements AdminArrayInterface
                 $wechatPerformanceAttribute->setPerformance(null);
             }
         }
-
-        return $this;
     }
 
     public function __toString(): string

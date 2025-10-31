@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Procedure;
 
 use Carbon\CarbonImmutable;
@@ -35,7 +37,7 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if ($account === null) {
+        if (null === $account) {
             throw new ApiException('找不到小程序');
         }
 
@@ -45,7 +47,8 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
             ->setParameter('account', $account)
             ->setParameter('date', CarbonImmutable::parse($this->date)->startOfDay())
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
+        ;
 
         $beforeRow = $this->pageDataRepository->createQueryBuilder('p')
             ->select('sum(p.pageVisitPv)')
@@ -53,7 +56,8 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
             ->setParameter('account', $account)
             ->setParameter('date', CarbonImmutable::parse($this->date)->subDay()->startOfDay())
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
+        ;
 
         $beforeSevenRow = $this->pageDataRepository->createQueryBuilder('p')
             ->select('sum(p.pageVisitPv)')
@@ -61,18 +65,35 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
             ->setParameter('account', $account)
             ->setParameter('date', CarbonImmutable::parse($this->date)->subDays(7)->startOfDay())
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
+        ;
 
         return [
             'total' => $row,
-            'totalCompare' => $beforeRow ? round(($row - $beforeRow) / $beforeRow, 4) : null,
-            'totalSevenCompare' => $beforeSevenRow ? round(($row - $beforeSevenRow) / $beforeSevenRow, 4) : null,
+            'totalCompare' => (null !== $beforeRow && is_numeric($beforeRow) && $beforeRow > 0 && is_numeric($row)) ? round(((float) $row - (float) $beforeRow) / (float) $beforeRow, 4) : null,
+            'totalSevenCompare' => (null !== $beforeSevenRow && is_numeric($beforeSevenRow) && $beforeSevenRow > 0 && is_numeric($row)) ? round(((float) $row - (float) $beforeSevenRow) / (float) $beforeSevenRow, 4) : null,
         ];
     }
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramPageVisitTotalDataByDate_{$request->getParams()->get('accountId')}_" . CarbonImmutable::parse($request->getParams()->get('date'))->startOfDay();
+        $params = $request->getParams();
+        if (null === $params) {
+            return 'GetWechatMiniProgramPageVisitTotalDataByDate_default';
+        }
+
+        $accountId = $params->get('accountId') ?? 'unknown';
+        $date = $params->get('date');
+
+        if (!is_string($accountId) && !is_numeric($accountId)) {
+            $accountId = 'unknown';
+        }
+
+        if (!is_string($date)) {
+            return "GetWechatMiniProgramPageVisitTotalDataByDate_{$accountId}_invalid_date";
+        }
+
+        return "GetWechatMiniProgramPageVisitTotalDataByDate_{$accountId}_" . CarbonImmutable::parse($date)->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int
@@ -80,8 +101,11 @@ class GetWechatMiniProgramPageVisitTotalDataByDate extends CacheableProcedure
         return 60 * 60;
     }
 
+    /**
+     * @return iterable<string>
+     */
     public function getCacheTags(JsonRpcRequest $request): iterable
     {
-        yield null;
+        yield 'wechat_page_visit';
     }
 }

@@ -1,46 +1,55 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\AccessSourceSessionCntRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: AccessSourceSessionCntRepository::class)]
 #[ORM\Table(name: 'wechat_access_source_session_cnt_data', options: ['comment' => '获取用户小程序访问分布数据(访问来源分布)'])]
 #[ORM\UniqueConstraint(name: 'wechat_access_source_session_cnt_uniq', columns: ['date', 'account_id', 'data_key'])]
-class AccessSourceSessionCnt implements AdminArrayInterface
-, \Stringable{
+class AccessSourceSessionCnt implements AdminArrayInterface, \Stringable
+{
     use SnowflakeKeyAware;
     use CreateTimeAware;
 
-
-    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '日期'])]
-    private ?\DateTimeInterface $date = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: false, options: ['comment' => '日期'])]
+    #[Assert\NotNull]
+    private ?\DateTimeImmutable $date = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '数据字段'])]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false, options: ['comment' => '数据字段'])]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
     private ?string $dataKey = null;
 
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '数据字段'])]
-    private ?string $DataValue = null;
-
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false, options: ['comment' => '数据字段'])]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
+    private ?string $dataValue = null;
 
     public function getDataValue(): ?string
     {
-        return $this->DataValue;
+        return $this->dataValue;
     }
 
-    public function setDataValue(?string $DataValue): void
+    public function setDataValue(?string $dataValue): void
     {
-        $this->DataValue = $DataValue;
+        $this->dataValue = $dataValue;
     }
 
     public function getDataKey(): ?string
@@ -53,14 +62,12 @@ class AccessSourceSessionCnt implements AdminArrayInterface
         $this->dataKey = $dataKey;
     }
 
-    public function setDate(?\DateTimeInterface $date): self
+    public function setDate(?\DateTimeImmutable $date): void
     {
         $this->date = $date;
-
-        return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
@@ -70,13 +77,14 @@ class AccessSourceSessionCnt implements AdminArrayInterface
         return $this->account;
     }
 
-    public function setAccount(?Account $account): self
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [

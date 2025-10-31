@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Procedure\DataCube;
 
 use Carbon\CarbonImmutable;
@@ -12,6 +14,7 @@ use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
 use Tourze\JsonRPCCacheBundle\Procedure\CacheableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
 use WechatMiniProgramBundle\Repository\AccountRepository;
+use WechatMiniProgramStatsBundle\Entity\UserPortraitAgeData;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitAgeDataRepository;
 use WechatMiniProgramStatsBundle\Service\WechatUserPortraitService;
 
@@ -37,7 +40,7 @@ class GetWechatMiniProgramUserPortraitAge extends CacheableProcedure
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if ($account === null) {
+        if (null === $account) {
             throw new ApiException('找不到小程序');
         }
 
@@ -55,12 +58,13 @@ class GetWechatMiniProgramUserPortraitAge extends CacheableProcedure
             default => throw new ApiException('no data'),
         };
 
+        /** @var UserPortraitAgeData[] $row */
         $row = $this->repository->findBy([
             'account' => $account,
             'date' => $date,
             'type' => 'visit_uv',
         ]);
-        if ((bool) empty($row)) {
+        if ([] === $row) {
             $this->service->getDate($account, $start, $end);
         }
 
@@ -72,12 +76,27 @@ class GetWechatMiniProgramUserPortraitAge extends CacheableProcedure
             ];
         }
 
-        return $list;
+        return ['data' => $list];
     }
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramUserPortraitAge_{$request->getParams()->get('accountId')}_{$request->getParams()->get('day')}";
+        $params = $request->getParams();
+        if (null === $params) {
+            throw new \InvalidArgumentException('Request params cannot be null');
+        }
+
+        $accountId = $params->get('accountId');
+        $day = $params->get('day');
+
+        if (!is_string($accountId) && !is_numeric($accountId)) {
+            throw new \InvalidArgumentException('Account ID must be a string or numeric');
+        }
+        if (!is_string($day) && !is_numeric($day)) {
+            throw new \InvalidArgumentException('Day must be a string or numeric');
+        }
+
+        return "GetWechatMiniProgramUserPortraitAge_{$accountId}_{$day}";
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int
@@ -85,8 +104,11 @@ class GetWechatMiniProgramUserPortraitAge extends CacheableProcedure
         return 60 * 60;
     }
 
+    /**
+     * @return iterable<string>
+     */
     public function getCacheTags(JsonRpcRequest $request): iterable
     {
-        yield null;
+        yield 'wechat_user_portrait';
     }
 }

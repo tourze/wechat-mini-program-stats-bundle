@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Procedure;
 
 use Carbon\CarbonImmutable;
@@ -42,7 +44,7 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if ($account === null) {
+        if (null === $account) {
             throw new ApiException('找不到小程序');
         }
 
@@ -53,7 +55,8 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
             ->setParameter('start', CarbonImmutable::now()->subDays((int) $this->day))
             ->setParameter('end', CarbonImmutable::now()->startOfDay())
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
+        ;
 
         $visitPv = $this->trendDataRepository->createQueryBuilder('t')
             ->select('sum(t.visitPv)')
@@ -62,7 +65,8 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
             ->setParameter('start', CarbonImmutable::now()->subDays((int) $this->day))
             ->setParameter('end', CarbonImmutable::now()->startOfDay())
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
+        ;
         $res = [
             'average' => intval($visitUv) < 1 ? 0 : intval($visitPv) / intval($visitUv),
         ];
@@ -74,7 +78,8 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
             ->setParameter('start', CarbonImmutable::now()->subDays(intval($this->day) + intval($this->day)))
             ->setParameter('end', CarbonImmutable::now()->startOfDay())
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
+        ;
 
         $beforeVisitPv = $this->trendDataRepository->createQueryBuilder('t')
             ->select('sum(t.visitPv)')
@@ -83,7 +88,8 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
             ->setParameter('start', CarbonImmutable::now()->subDays(intval($this->day) + intval($this->day)))
             ->setParameter('end', CarbonImmutable::now()->startOfDay())
             ->getQuery()
-            ->getSingleScalarResult();
+            ->getSingleScalarResult()
+        ;
 
         $this->logger->info('所有数据', [
             'visitUv' => intval($visitUv),
@@ -100,7 +106,22 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramVisitUvAverage_{$request->getParams()->get('accountId')}_{$request->getParams()->get('day')}";
+        $params = $request->getParams();
+        if (null === $params) {
+            return 'GetWechatMiniProgramVisitUvAverage_default';
+        }
+
+        $accountId = $params->get('accountId') ?? 'unknown';
+        $day = $params->get('day') ?? 'unknown';
+
+        if (!is_string($accountId) && !is_numeric($accountId)) {
+            $accountId = 'unknown';
+        }
+        if (!is_string($day) && !is_numeric($day)) {
+            $day = 'unknown';
+        }
+
+        return "GetWechatMiniProgramVisitUvAverage_{$accountId}_{$day}";
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int
@@ -108,8 +129,11 @@ class GetWechatMiniProgramVisitUvAverage extends CacheableProcedure
         return 60 * 60;
     }
 
+    /**
+     * @return iterable<string>
+     */
     public function getCacheTags(JsonRpcRequest $request): iterable
     {
-        yield null;
+        yield 'wechat_stats';
     }
 }

@@ -1,36 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserAccessesMonthDataRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: UserAccessesMonthDataRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_user_accesses_month_data', options: ['comment' => '获取用户访问小程序月留存'])]
 #[ORM\UniqueConstraint(name: 'wechat_mini_program_user_accesses_month_data_uniq', columns: ['date', 'account_id', 'type'])]
-class UserAccessesMonthData implements AdminArrayInterface
-, \Stringable{
+class UserAccessesMonthData implements AdminArrayInterface, \Stringable
+{
     use SnowflakeKeyAware;
     use CreateTimeAware;
 
-
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '日期'])]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
     private ?string $date = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '留存标记'])]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
     private ?string $retentionMark = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '类型'])]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
     private ?string $type = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '用户数量'])]
+    #[Assert\NotNull]
+    #[Assert\Length(max: 255)]
     private ?string $userNumber = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
-
 
     public function getType(): ?string
     {
@@ -62,11 +78,9 @@ class UserAccessesMonthData implements AdminArrayInterface
         $this->retentionMark = $retentionMark;
     }
 
-    public function setDate(?string $date): self
+    public function setDate(?string $date): void
     {
         $this->date = $date;
-
-        return $this;
     }
 
     public function getDate(): ?string
@@ -79,13 +93,14 @@ class UserAccessesMonthData implements AdminArrayInterface
         return $this->account;
     }
 
-    public function setAccount(?Account $account): self
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [

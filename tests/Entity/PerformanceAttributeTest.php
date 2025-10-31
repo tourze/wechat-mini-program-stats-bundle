@@ -1,29 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Tests\Entity;
 
-use DateTimeImmutable;
-use PHPUnit\Framework\TestCase;
-use WechatMiniProgramBundle\Entity\Account;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use WechatMiniProgramStatsBundle\Entity\PerformanceAttribute;
 
-class PerformanceAttributeTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(PerformanceAttribute::class)]
+final class PerformanceAttributeTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new PerformanceAttribute();
+    }
+
+    /**
+     * @return iterable<array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'name' => ['name', 'test_name'],
+            'value' => ['value', 'test_value'],
+        ];
+    }
+
     private PerformanceAttribute $performanceAttribute;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->performanceAttribute = new PerformanceAttribute();
     }
 
-    public function testId_initiallyNull(): void
+    public function testIdInitiallyNull(): void
     {
-        $this->assertEquals(0, $this->performanceAttribute->getId());
+        self::assertEquals(0, $this->performanceAttribute->getId());
     }
 
-    public function testToString_returnsIdAsString(): void
+    public function testToStringReturnsIdAsString(): void
     {
         $result = $this->performanceAttribute->__toString();
-        $this->assertSame('0', $result); // ID is 0 initially
+        self::assertSame('0', $result); // ID is 0 initially
     }
 }

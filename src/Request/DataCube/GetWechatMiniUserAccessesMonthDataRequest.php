@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Request\DataCube;
 
 use Carbon\CarbonInterface;
@@ -19,6 +21,9 @@ class GetWechatMiniUserAccessesMonthDataRequest extends WithAccountRequest
         return '/datacube/getweanalysisappidmonthlyretaininfo';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $json = [

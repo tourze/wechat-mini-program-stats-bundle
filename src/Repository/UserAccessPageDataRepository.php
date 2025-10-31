@@ -1,21 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use WechatMiniProgramStatsBundle\Entity\UserAccessPageData;
 
 /**
- * @method UserAccessPageData|null find($id, $lockMode = null, $lockVersion = null)
- * @method UserAccessPageData|null findOneBy(array $criteria, array $orderBy = null)
- * @method UserAccessPageData[]    findAll()
- * @method UserAccessPageData[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<UserAccessPageData>
  */
+#[AsRepository(entityClass: UserAccessPageData::class)]
 class UserAccessPageDataRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, UserAccessPageData::class);
+    }
+
+    public function save(UserAccessPageData $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(UserAccessPageData $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

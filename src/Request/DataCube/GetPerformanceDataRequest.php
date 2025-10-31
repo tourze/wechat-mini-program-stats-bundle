@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Request\DataCube;
 
 use WechatMiniProgramBundle\Request\WithAccountRequest;
@@ -9,8 +11,11 @@ use WechatMiniProgramBundle\Request\WithAccountRequest;
  */
 class GetPerformanceDataRequest extends WithAccountRequest
 {
+    /** @var array<string, array<string, string>> */
     private array $params;
+
     private object $time;
+
     private int $module;
 
     public function getRequestPath(): string
@@ -18,6 +23,12 @@ class GetPerformanceDataRequest extends WithAccountRequest
         return '/wxa/business/performance/boot';
     }
 
+    /**
+     * @return array<string, array<string, mixed>>|null
+     */
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $json = [
@@ -31,11 +42,17 @@ class GetPerformanceDataRequest extends WithAccountRequest
         ];
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public function getParams(): array
     {
         return $this->params;
     }
 
+    /**
+     * @param array<string, array<string, string>> $params
+     */
     public function setParams(array $params): void
     {
         $this->params = $params;

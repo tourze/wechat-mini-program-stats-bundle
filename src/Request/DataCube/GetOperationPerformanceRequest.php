@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Request\DataCube;
 
 use WechatMiniProgramBundle\Request\WithAccountRequest;
@@ -38,6 +40,9 @@ class GetOperationPerformanceRequest extends WithAccountRequest
         return '/wxaapi/log/get_performance';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $json = [

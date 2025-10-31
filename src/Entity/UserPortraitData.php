@@ -1,42 +1,63 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitDataRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: UserPortraitDataRepository::class)]
 #[ORM\Table(name: 'wechat_user_access_portrait_data', options: ['comment' => '用户画像分布数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_user_access_portrait_data_uniq', columns: ['date', 'name', 'account_id', 'type'])]
-class UserPortraitData implements AdminArrayInterface
-, \Stringable{
+class UserPortraitData implements AdminArrayInterface, \Stringable
+{
     use SnowflakeKeyAware;
     use CreateTimeAware;
-
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '日期'])]
+    #[Assert\Length(max: 255)]
     private ?string $date = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '类型'])]
+    #[Assert\Length(max: 255)]
     private ?string $type = null;
 
-    private ?\DateTimeInterface $beginTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '开始时间'])]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
+    private ?\DateTimeImmutable $beginTime = null;
 
-    private ?\DateTimeInterface $endTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '结束时间'])]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
+    private ?\DateTimeImmutable $endTime = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '用户类型'])]
+    #[Assert\Length(max: 255)]
     private ?string $userType = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '省份'])]
+    #[Assert\Length(max: 255)]
     private ?string $province = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '名称'])]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '值'])]
+    #[Assert\Length(max: 255)]
     private ?string $value = null;
 
     //    private ?string $city = null;
@@ -52,7 +73,6 @@ class UserPortraitData implements AdminArrayInterface
     //
     //    //    #[ORM\Column(length: 100, options: ['comment' => '年龄'])]
     //    private ?string $ages = null;
-
     //    public function setAges(?string $ages): void
     //    {
     //        $this->ages = $ages;
@@ -96,7 +116,6 @@ class UserPortraitData implements AdminArrayInterface
     //    {
     //        return $this->city;
     //    }
-
     public function setType(?string $type): void
     {
         $this->type = $type;
@@ -107,11 +126,9 @@ class UserPortraitData implements AdminArrayInterface
         return $this->type;
     }
 
-    public function setDate(?string $date): self
+    public function setDate(?string $date): void
     {
         $this->date = $date;
-
-        return $this;
     }
 
     public function getDate(): ?string
@@ -149,28 +166,24 @@ class UserPortraitData implements AdminArrayInterface
         return $this->province;
     }
 
-    public function getBeginTime(): ?\DateTimeInterface
+    public function getBeginTime(): ?\DateTimeImmutable
     {
         return $this->beginTime;
     }
 
-    public function setBeginTime(?\DateTimeInterface $beginTime): self
+    public function setBeginTime(?\DateTimeImmutable $beginTime): void
     {
         $this->beginTime = $beginTime;
-
-        return $this;
     }
 
-    public function getEndTime(): ?\DateTimeInterface
+    public function getEndTime(): ?\DateTimeImmutable
     {
         return $this->endTime;
     }
 
-    public function setEndTime(?\DateTimeInterface $endTime): self
+    public function setEndTime(?\DateTimeImmutable $endTime): void
     {
         $this->endTime = $endTime;
-
-        return $this;
     }
 
     public function setUserType(?string $userType): void
@@ -188,13 +201,19 @@ class UserPortraitData implements AdminArrayInterface
         return $this->account;
     }
 
-    public function setAccount(?Account $account): self
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
+    public function setCreateTime(?\DateTimeImmutable $createTime): void
+    {
+        $this->createTime = $createTime;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [

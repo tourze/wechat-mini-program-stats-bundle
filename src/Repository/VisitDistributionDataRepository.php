@@ -1,21 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use WechatMiniProgramStatsBundle\Entity\VisitDistributionData;
 
 /**
- * @method VisitDistributionData|null find($id, $lockMode = null, $lockVersion = null)
- * @method VisitDistributionData|null findOneBy(array $criteria, array $orderBy = null)
- * @method VisitDistributionData[]    findAll()
- * @method VisitDistributionData[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<VisitDistributionData>
  */
+#[AsRepository(entityClass: VisitDistributionData::class)]
 class VisitDistributionDataRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, VisitDistributionData::class);
+    }
+
+    public function save(VisitDistributionData $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(VisitDistributionData $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

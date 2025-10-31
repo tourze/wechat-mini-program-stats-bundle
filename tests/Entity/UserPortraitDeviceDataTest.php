@@ -1,29 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Tests\Entity;
 
-use DateTimeImmutable;
-use PHPUnit\Framework\TestCase;
-use WechatMiniProgramBundle\Entity\Account;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitDeviceData;
 
-class UserPortraitDeviceDataTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(UserPortraitDeviceData::class)]
+final class UserPortraitDeviceDataTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new UserPortraitDeviceData();
+    }
+
+    /**
+     * @return iterable<array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'id' => ['id', 'test_id'],
+            'createTime' => ['createTime', new \DateTimeImmutable()],
+        ];
+    }
+
     private UserPortraitDeviceData $userPortraitDeviceData;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->userPortraitDeviceData = new UserPortraitDeviceData();
     }
 
-    public function testId_initiallyNull(): void
+    public function testIdInitiallyNull(): void
     {
-        $this->assertNull($this->userPortraitDeviceData->getId());
+        self::assertNull($this->userPortraitDeviceData->getId());
     }
 
-    public function testToString_returnsIdAsString(): void
+    public function testToStringReturnsIdAsString(): void
     {
         $result = $this->userPortraitDeviceData->__toString();
-        $this->assertSame('', $result); // ID is null initially
+        self::assertSame('', $result); // ID is null initially
     }
 }

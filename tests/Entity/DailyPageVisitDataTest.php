@@ -1,115 +1,134 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Tests\Entity;
 
-use DateTimeImmutable;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use WechatMiniProgramStatsBundle\Entity\DailyPageVisitData;
 
-class DailyPageVisitDataTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(DailyPageVisitData::class)]
+final class DailyPageVisitDataTest extends AbstractEntityTestCase
 {
+    protected function createEntity(): object
+    {
+        return new DailyPageVisitData();
+    }
+
+    /**
+     * @return iterable<array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'page' => ['page', 'test_value'],
+            'visitPv' => ['visitPv', 123],
+        ];
+    }
+
     private DailyPageVisitData $dailyPageVisitData;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->dailyPageVisitData = new DailyPageVisitData();
     }
 
-    public function testId_initiallyNull(): void
+    public function testIdInitiallyNull(): void
     {
-        $this->assertEquals(0, $this->dailyPageVisitData->getId());
+        self::assertEquals(0, $this->dailyPageVisitData->getId());
     }
 
-    public function testCreateTime_getterAndSetter(): void
+    public function testCreateTimeGetterAndSetter(): void
     {
-        $now = new DateTimeImmutable();
-        $this->assertNull($this->dailyPageVisitData->getCreateTime());
+        $now = new \DateTimeImmutable();
+        self::assertNull($this->dailyPageVisitData->getCreateTime());
 
-        $result = $this->dailyPageVisitData->setCreateTime($now);
+        $this->dailyPageVisitData->setCreateTime($now);
 
-        $this->assertSame($now, $this->dailyPageVisitData->getCreateTime());
-        $this->assertSame($this->dailyPageVisitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($now, $this->dailyPageVisitData->getCreateTime());
     }
 
-    public function testUpdateTime_getterAndSetter(): void
+    public function testUpdateTimeGetterAndSetter(): void
     {
-        $now = new DateTimeImmutable();
-        $this->assertNull($this->dailyPageVisitData->getUpdateTime());
+        $now = new \DateTimeImmutable();
+        self::assertNull($this->dailyPageVisitData->getUpdateTime());
 
-        $result = $this->dailyPageVisitData->setUpdateTime($now);
+        $this->dailyPageVisitData->setUpdateTime($now);
 
-        $this->assertSame($now, $this->dailyPageVisitData->getUpdateTime());
-        $this->assertSame($this->dailyPageVisitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($now, $this->dailyPageVisitData->getUpdateTime());
     }
 
-    public function testDate_getterAndSetter(): void
+    public function testDateGetterAndSetter(): void
     {
-        $date = new DateTimeImmutable('2023-01-01');
-        $this->assertNull($this->dailyPageVisitData->getDate());
+        $date = new \DateTimeImmutable('2023-01-01');
+        self::assertNull($this->dailyPageVisitData->getDate());
 
-        $result = $this->dailyPageVisitData->setDate($date);
+        $this->dailyPageVisitData->setDate($date);
 
-        $this->assertSame($date, $this->dailyPageVisitData->getDate());
-        $this->assertSame($this->dailyPageVisitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($date, $this->dailyPageVisitData->getDate());
     }
 
-    public function testPage_getterAndSetter(): void
+    public function testPageGetterAndSetter(): void
     {
         $page = '/pages/index';
 
-        $result = $this->dailyPageVisitData->setPage($page);
+        $this->dailyPageVisitData->setPage($page);
 
-        $this->assertSame($page, $this->dailyPageVisitData->getPage());
-        $this->assertSame($this->dailyPageVisitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($page, $this->dailyPageVisitData->getPage());
     }
 
-    public function testVisitPv_getterAndSetter(): void
+    public function testVisitPvGetterAndSetter(): void
     {
         $visitPv = 100;
 
-        $result = $this->dailyPageVisitData->setVisitPv($visitPv);
+        $this->dailyPageVisitData->setVisitPv($visitPv);
 
-        $this->assertSame($visitPv, $this->dailyPageVisitData->getVisitPv());
-        $this->assertSame($this->dailyPageVisitData, $result, 'Setter should return self for method chaining');
+        self::assertSame($visitPv, $this->dailyPageVisitData->getVisitPv());
     }
 
-    public function testVisitUv_getterAndSetter(): void
+    public function testVisitUvGetterAndSetter(): void
     {
         $visitUv = 50;
 
         $this->dailyPageVisitData->setVisitUv($visitUv);
 
-        $this->assertSame($visitUv, $this->dailyPageVisitData->getVisitUv());
+        self::assertSame($visitUv, $this->dailyPageVisitData->getVisitUv());
     }
 
-    public function testNewUserVisitPv_getterAndSetter(): void
+    public function testNewUserVisitPvGetterAndSetter(): void
     {
         $newUserVisitPv = 30;
 
         $this->dailyPageVisitData->setNewUserVisitPv($newUserVisitPv);
 
-        $this->assertSame($newUserVisitPv, $this->dailyPageVisitData->getNewUserVisitPv());
+        self::assertSame($newUserVisitPv, $this->dailyPageVisitData->getNewUserVisitPv());
     }
 
-    public function testNewUserVisitUv_getterAndSetter(): void
+    public function testNewUserVisitUvGetterAndSetter(): void
     {
         $newUserVisitUv = 20;
 
         $this->dailyPageVisitData->setNewUserVisitUv($newUserVisitUv);
 
-        $this->assertSame($newUserVisitUv, $this->dailyPageVisitData->getNewUserVisitUv());
+        self::assertSame($newUserVisitUv, $this->dailyPageVisitData->getNewUserVisitUv());
     }
 
-    public function testRetrieveAdminArray_returnsExpectedFormat(): void
+    public function testRetrieveAdminArrayReturnsExpectedFormat(): void
     {
-        $date = new DateTimeImmutable('2023-01-01');
+        $date = new \DateTimeImmutable('2023-01-01');
         $page = '/pages/index';
         $visitPv = 100;
         $visitUv = 50;
         $newUserVisitPv = 30;
         $newUserVisitUv = 20;
-        $createTime = new DateTimeImmutable();
-        $updateTime = new DateTimeImmutable();
+        $createTime = new \DateTimeImmutable();
+        $updateTime = new \DateTimeImmutable();
 
         $this->dailyPageVisitData->setDate($date);
         $this->dailyPageVisitData->setPage($page);
@@ -122,26 +141,26 @@ class DailyPageVisitDataTest extends TestCase
 
         $result = $this->dailyPageVisitData->retrieveAdminArray();
 
-        $this->assertArrayHasKey('id', $result);
-        $this->assertArrayHasKey('date', $result);
-        $this->assertArrayHasKey('page', $result);
-        $this->assertArrayHasKey('visitPv', $result);
-        $this->assertArrayHasKey('visitUv', $result);
-        $this->assertArrayHasKey('newUserVisitPv', $result);
-        $this->assertArrayHasKey('newUserVisitUv', $result);
-        $this->assertArrayHasKey('createTime', $result);
-        $this->assertArrayHasKey('updateTime', $result);
-        $this->assertSame($date, $result['date']);
-        $this->assertSame($page, $result['page']);
-        $this->assertSame($visitPv, $result['visitPv']);
-        $this->assertSame($visitUv, $result['visitUv']);
-        $this->assertSame($newUserVisitPv, $result['newUserVisitPv']);
-        $this->assertSame($newUserVisitUv, $result['newUserVisitUv']);
+        self::assertArrayHasKey('id', $result);
+        self::assertArrayHasKey('date', $result);
+        self::assertArrayHasKey('page', $result);
+        self::assertArrayHasKey('visitPv', $result);
+        self::assertArrayHasKey('visitUv', $result);
+        self::assertArrayHasKey('newUserVisitPv', $result);
+        self::assertArrayHasKey('newUserVisitUv', $result);
+        self::assertArrayHasKey('createTime', $result);
+        self::assertArrayHasKey('updateTime', $result);
+        self::assertSame($date, $result['date']);
+        self::assertSame($page, $result['page']);
+        self::assertSame($visitPv, $result['visitPv']);
+        self::assertSame($visitUv, $result['visitUv']);
+        self::assertSame($newUserVisitPv, $result['newUserVisitPv']);
+        self::assertSame($newUserVisitUv, $result['newUserVisitUv']);
     }
 
-    public function testToString_returnsIdAsString(): void
+    public function testToStringReturnsIdAsString(): void
     {
         $result = $this->dailyPageVisitData->__toString();
-        $this->assertSame('0', $result); // ID is 0 initially
+        self::assertSame('0', $result); // ID is 0 initially
     }
 }

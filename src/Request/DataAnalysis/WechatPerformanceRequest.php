@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Request\DataAnalysis;
 
 use WechatMiniProgramBundle\Request\WithAccountRequest;
@@ -15,6 +17,9 @@ class WechatPerformanceRequest extends WithAccountRequest
 
     private string $module;
 
+    /**
+     * @var array<string, mixed>
+     */
     private array $params = [];
 
     public function getRequestPath(): string
@@ -22,6 +27,9 @@ class WechatPerformanceRequest extends WithAccountRequest
         return '/wxa/business/performance/boot';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         return [
@@ -71,11 +79,17 @@ class WechatPerformanceRequest extends WithAccountRequest
         $this->module = $module;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getParams(): array
     {
         return $this->params;
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function setParams(array $params): void
     {
         $this->params = $params;

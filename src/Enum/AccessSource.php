@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Enum;
 
 use Tourze\EnumExtra\Itemable;
@@ -83,7 +85,7 @@ enum AccessSource: int implements Labelable, Itemable, Selectable
             self::TYPE_25 => '搜索框快捷入口',
             self::TYPE_26 => '小程序客服消息',
             self::TYPE_27 => '公众号下发',
-            self::TYPE_28 => '未知来源',
+            self::TYPE_28 => '未知来源28',
             self::TYPE_29 => '任务栏-最近使用',
             self::TYPE_30 => '长按小程序菜单圆点',
             self::TYPE_31 => '连wifi成功页',

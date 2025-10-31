@@ -1,56 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\UserAccessPageDataRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: UserAccessPageDataRepository::class)]
 #[ORM\Table(name: 'wechat_user_access_page_data', options: ['comment' => '用户访问页面数据'])]
-#[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'page_path', 'account_id'])]
-class UserAccessPageData implements AdminArrayInterface
-, \Stringable{
+#[ORM\UniqueConstraint(name: 'wechat_user_access_page_idx_uniq', columns: ['date', 'page_path', 'account_id'])]
+class UserAccessPageData implements AdminArrayInterface, \Stringable
+{
     use SnowflakeKeyAware;
     use CreateTimeAware;
 
-
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '日期'])]
-    private ?\DateTimeInterface $date = null;
+    #[Assert\Type(type: \DateTimeImmutable::class)]
+    private ?\DateTimeImmutable $date = null;
 
+    #[ORM\Column(type: Types::STRING, length: 500, nullable: true, options: ['comment' => '页面路径'])]
+    #[Assert\Length(max: 500)]
     private ?string $pagePath;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '页面访问PV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $pageVisitPv = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '页面访问UV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $pageVisitUv = 0;
 
+    #[ORM\Column(type: Types::FLOAT, nullable: true, options: ['comment' => '页面停留时间', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?float $pageStayTime = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '入口页面PV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $entryPagePv = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '出口页面PV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $exitPagePv = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '页面分享PV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $pageSharePv = 0;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '页面分享UV', 'default' => 0])]
+    #[Assert\PositiveOrZero]
     private ?int $pageShareUv = 0;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-
-    public function setDate(?\DateTimeInterface $date): self
+    public function setDate(?\DateTimeImmutable $date): void
     {
         $this->date = $date;
-
-        return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
@@ -140,13 +159,14 @@ class UserAccessPageData implements AdminArrayInterface
         return $this->account;
     }
 
-    public function setAccount(?Account $account): self
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [

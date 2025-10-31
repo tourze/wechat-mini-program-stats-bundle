@@ -1,8 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Service;
 
+use Carbon\CarbonInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramBundle\Service\Client;
@@ -12,6 +17,7 @@ use WechatMiniProgramStatsBundle\Entity\UserPortraitDeviceData;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitGendersData;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitPlatformData;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitProvinceData;
+use WechatMiniProgramStatsBundle\Interface\UserPortraitEntityInterface;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitAgeDataRepository;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitCityDataRepository;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitDeviceDataRepository;
@@ -20,6 +26,7 @@ use WechatMiniProgramStatsBundle\Repository\UserPortraitPlatformDataRepository;
 use WechatMiniProgramStatsBundle\Repository\UserPortraitProvinceDataRepository;
 use WechatMiniProgramStatsBundle\Request\DataCube\GetWechatUserPortraitRequest;
 
+#[WithMonologChannel(channel: 'wechat_mini_program_stats')]
 class WechatUserPortraitService
 {
     public function __construct(
@@ -35,7 +42,7 @@ class WechatUserPortraitService
     ) {
     }
 
-    public function getDate(Account $account, $start, $end)
+    public function getDate(Account $account, CarbonInterface $start, CarbonInterface $end): void
     {
         $request = new GetWechatUserPortraitRequest();
         $request->setAccount($account);
@@ -52,306 +59,89 @@ class WechatUserPortraitService
 
             return;
         }
-        if ((bool) isset($res['visit_uv_new'])) {
-            foreach ($res['visit_uv_new']['province'] as $provinceValue) {
-                $provinceData = $this->provinceRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'name' => $provinceValue['name'],
-                    'type' => 'visit_uv_new',
-                ]);
-                if ($provinceData === null) {
-                    $provinceData = new UserPortraitProvinceData();
-                    $provinceData->setAccount($account);
-                    $provinceData->setType('visit_uv_new');
-                    $provinceData->setDate($res['ref_date']);
-                    $provinceData->setName($provinceValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($provinceValue['id'])) {
-                    $valueId = $provinceValue['id'];
-                }
-                $provinceData->setValueId($valueId);
-                $provinceData->setValue($provinceValue['value']);
-                $this->entityManager->persist($provinceData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($provinceData);
+
+        if (!is_array($res) || !isset($res['ref_date']) || !is_string($res['ref_date'])) {
+            return;
+        }
+
+        if (isset($res['visit_uv_new']) && is_array($res['visit_uv_new'])) {
+            /** @var array<string, array<int, array<string, mixed>>> $visitUvNew */
+            $visitUvNew = $res['visit_uv_new'];
+            $this->processUserPortraitData($visitUvNew, $res['ref_date'], $account, 'visit_uv_new');
+        }
+
+        if (isset($res['visit_uv']) && is_array($res['visit_uv'])) {
+            /** @var array<string, array<int, array<string, mixed>>> $visitUv */
+            $visitUv = $res['visit_uv'];
+            $this->processUserPortraitData($visitUv, $res['ref_date'], $account, 'visit_uv');
+        }
+    }
+
+    /**
+     * @param array<string, array<int, array<string, mixed>>> $data
+     */
+    private function processUserPortraitData(array $data, string $refDate, Account $account, string $type): void
+    {
+        $processors = [
+            'province' => [$this->provinceRepository, UserPortraitProvinceData::class],
+            'city' => [$this->cityRepository, UserPortraitCityData::class],
+            'genders' => [$this->gendersRepository, UserPortraitGendersData::class],
+            'platforms' => [$this->platformRepository, UserPortraitPlatformData::class],
+            'devices' => [$this->deviceRepository, UserPortraitDeviceData::class],
+            'ages' => [$this->ageRepository, UserPortraitAgeData::class],
+        ];
+
+        foreach ($processors as $key => [$repository, $entityClass]) {
+            if (!isset($data[$key]) || !is_array($data[$key])) {
+                continue;
             }
 
-            foreach ($res['visit_uv_new']['city'] as $cityValue) {
-                $cityData = $this->cityRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'name' => $cityValue['name'],
-                    'type' => 'visit_uv_new',
-                ]);
-                if ($cityData === null) {
-                    $cityData = new UserPortraitCityData();
-                    $cityData->setAccount($account);
-                    $cityData->setName($cityValue['name']);
-                    $cityData->setType('visit_uv_new');
-                    $cityData->setDate($res['ref_date']);
+            foreach ($data[$key] as $value) {
+                if (is_array($value)) {
+                    /** @var array<string, mixed> $value */
+                    $this->processPortraitEntity($repository, $entityClass, $value, $refDate, $account, $type);
                 }
-                $valueId = '';
-                if ((bool) isset($cityValue['id'])) {
-                    $valueId = $cityValue['id'];
-                }
-                $cityData->setValueId($valueId);
-                $cityData->setValue($cityValue['value']);
-                $this->entityManager->persist($cityData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($cityData);
-            }
-
-            foreach ($res['visit_uv_new']['genders'] as $genderValue) {
-                $genderData = $this->gendersRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'name' => $genderValue['name'],
-                    'type' => 'visit_uv_new',
-                ]);
-                if ($genderData === null) {
-                    $genderData = new UserPortraitGendersData();
-                    $genderData->setAccount($account);
-                    $genderData->setType('visit_uv_new');
-                    $genderData->setDate($res['ref_date']);
-                    $genderData->setName($genderValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($genderValue['id'])) {
-                    $valueId = $genderValue['id'];
-                }
-                $genderData->setValueId($valueId);
-                $genderData->setValue($genderValue['value']);
-                $this->entityManager->persist($genderData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($genderData);
-            }
-
-            foreach ($res['visit_uv_new']['platforms'] as $platformValue) {
-                $platformData = $this->platformRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'name' => $platformValue['name'],
-                    'type' => 'visit_uv_new',
-                ]);
-                if ($platformData === null) {
-                    $platformData = new UserPortraitPlatformData();
-                    $platformData->setAccount($account);
-                    $platformData->setType('visit_uv_new');
-                    $platformData->setDate($res['ref_date']);
-                    $platformData->setName($platformValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($platformValue['id'])) {
-                    $valueId = $platformValue['id'];
-                }
-                $platformData->setValueId($valueId);
-                $platformData->setValue($platformValue['value']);
-                $this->entityManager->persist($platformData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($platformData);
-            }
-
-            foreach ($res['visit_uv_new']['devices'] as $deviceValue) {
-                $deviceData = $this->deviceRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'name' => $deviceValue['name'],
-                    'type' => 'visit_uv_new',
-                ]);
-                if ($deviceData === null) {
-                    $deviceData = new UserPortraitDeviceData();
-                    $deviceData->setAccount($account);
-                    $deviceData->setType('visit_uv_new');
-                    $deviceData->setDate($res['ref_date']);
-                    $deviceData->setName($deviceValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($deviceValue['id'])) {
-                    $valueId = $deviceValue['id'];
-                }
-                $deviceData->setValueId($valueId);
-                $deviceData->setValue($deviceValue['value']);
-                $this->entityManager->persist($deviceData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($deviceData);
-            }
-
-            foreach ($res['visit_uv_new']['ages'] as $ageValue) {
-                $ageData = $this->ageRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'name' => $ageValue['name'],
-                    'type' => 'visit_uv_new',
-                ]);
-                if ($ageData === null) {
-                    $ageData = new UserPortraitAgeData();
-                    $ageData->setAccount($account);
-                    $ageData->setType('visit_uv_new');
-                    $ageData->setDate($res['ref_date']);
-                    $ageData->setName($ageValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($ageValue['id'])) {
-                    $valueId = $ageValue['id'];
-                }
-                $ageData->setValueId($valueId);
-                $ageData->setValue($ageValue['value']);
-                $this->entityManager->persist($ageData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($ageData);
             }
         }
-        if ((bool) isset($res['visit_uv'])) {
-            foreach ($res['visit_uv']['province'] as $provinceValue) {
-                $provinceData = $this->provinceRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'name' => $provinceValue['name'],
-                    'type' => 'visit_uv',
-                ]);
-                if ($provinceData === null) {
-                    $provinceData = new UserPortraitProvinceData();
-                    $provinceData->setAccount($account);
-                    $provinceData->setType('visit_uv');
-                    $provinceData->setDate($res['ref_date']);
-                    $provinceData->setName($provinceValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($provinceValue['id'])) {
-                    $valueId = $provinceValue['id'];
-                }
-                $provinceData->setValueId($valueId);
-                $provinceData->setValue($provinceValue['value']);
-                $this->entityManager->persist($provinceData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($provinceData);
-            }
+    }
 
-            foreach ($res['visit_uv']['city'] as $cityValue) {
-                $cityData = $this->cityRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'type' => 'visit_uv',
-                    'name' => $cityValue['name'],
-                ]);
-                if ($cityData === null) {
-                    $cityData = new UserPortraitCityData();
-                    $cityData->setAccount($account);
-                    $cityData->setType('visit_uv');
-                    $cityData->setDate($res['ref_date']);
-                    $cityData->setName($cityValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($cityValue['id'])) {
-                    $valueId = $cityValue['id'];
-                }
-                $cityData->setValueId($valueId);
-                $cityData->setValue($cityValue['value']);
-                $this->entityManager->persist($cityData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($cityData);
-            }
-
-            foreach ($res['visit_uv']['genders'] as $genderValue) {
-                $genderData = $this->gendersRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'type' => 'visit_uv',
-                    'name' => $genderValue['name'],
-                ]);
-                if ($genderData === null) {
-                    $genderData = new UserPortraitGendersData();
-                    $genderData->setAccount($account);
-                    $genderData->setType('visit_uv');
-                    $genderData->setDate($res['ref_date']);
-                    $genderData->setName($genderValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($genderValue['id'])) {
-                    $valueId = $genderValue['id'];
-                }
-                $genderData->setValueId($valueId);
-                $genderData->setValue($genderValue['value']);
-                $this->entityManager->persist($genderData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($genderData);
-            }
-
-            foreach ($res['visit_uv']['platforms'] as $platformValue) {
-                $platformData = $this->platformRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'type' => 'visit_uv',
-                    'name' => $platformValue['name'],
-                ]);
-                if ($platformData === null) {
-                    $platformData = new UserPortraitPlatformData();
-                    $platformData->setAccount($account);
-                    $platformData->setType('visit_uv');
-                    $platformData->setDate($res['ref_date']);
-                    $platformData->setName($platformValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($platformValue['id'])) {
-                    $valueId = $platformValue['id'];
-                }
-                $platformData->setValueId($valueId);
-                $platformData->setValue($platformValue['value']);
-                $this->entityManager->persist($platformData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($platformData);
-            }
-
-            foreach ($res['visit_uv']['devices'] as $deviceValue) {
-                $deviceData = $this->deviceRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'type' => 'visit_uv',
-                ]);
-                if ($deviceData === null) {
-                    $deviceData = new UserPortraitDeviceData();
-                    $deviceData->setAccount($account);
-                    $deviceData->setType('visit_uv');
-                    $deviceData->setDate($res['ref_date']);
-                }
-                $valueId = '';
-                if ((bool) isset($deviceValue['id'])) {
-                    $valueId = $deviceValue['id'];
-                }
-                $deviceData->setValueId($valueId);
-                $deviceData->setName($deviceValue['name']);
-                $deviceData->setValue($deviceValue['value']);
-                $this->entityManager->persist($deviceData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($deviceData);
-            }
-
-            foreach ($res['visit_uv']['ages'] as $ageValue) {
-                $ageData = $this->ageRepository->findOneBy([
-                    'date' => $res['ref_date'],
-                    'account' => $account,
-                    'type' => 'visit_uv',
-                    'name' => $ageValue['name'],
-                ]);
-                if ($ageData === null) {
-                    $ageData = new UserPortraitAgeData();
-                    $ageData->setAccount($account);
-                    $ageData->setType('visit_uv');
-                    $ageData->setDate($res['ref_date']);
-                    $ageData->setName($ageValue['name']);
-                }
-                $valueId = '';
-                if ((bool) isset($ageValue['id'])) {
-                    $valueId = $ageValue['id'];
-                }
-                $ageData->setValueId($valueId);
-                $ageData->setValue($ageValue['value']);
-                $this->entityManager->persist($ageData);
-                $this->entityManager->flush();
-                $this->entityManager->detach($ageData);
-            }
+    /**
+     * @param UserPortraitProvinceDataRepository|UserPortraitCityDataRepository|UserPortraitGendersDataRepository|UserPortraitPlatformDataRepository|UserPortraitDeviceDataRepository|UserPortraitAgeDataRepository $repository
+     * @param class-string<UserPortraitEntityInterface> $entityClass
+     * @param array<string, mixed> $value
+     */
+    private function processPortraitEntity(object $repository, string $entityClass, array $value, string $refDate, Account $account, string $type): void
+    {
+        $name = $value['name'] ?? null;
+        if (!is_string($name)) {
+            return;
         }
+
+        /** @var UserPortraitAgeData|UserPortraitCityData|UserPortraitDeviceData|UserPortraitGendersData|UserPortraitPlatformData|UserPortraitProvinceData|null $entity */
+        $entity = $repository->findOneBy([
+            'date' => $refDate,
+            'account' => $account,
+            'name' => $name,
+            'type' => $type,
+        ]);
+
+        if (null === $entity) {
+            /** @var UserPortraitEntityInterface $entity */
+            $entity = new $entityClass();
+            $entity->setAccount($account);
+            $entity->setType($type);
+            $entity->setDate($refDate);
+            $entity->setName($name);
+        }
+
+        $valueId = isset($value['id']) && (is_string($value['id']) || is_null($value['id'])) ? $value['id'] : null;
+        $entityValue = isset($value['value']) && (is_string($value['value']) || is_null($value['value'])) ? $value['value'] : null;
+
+        $entity->setValueId($valueId);
+        $entity->setValue($entityValue);
+
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+        $this->entityManager->detach($entity);
     }
 }

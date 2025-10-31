@@ -1,38 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\VisitDistributionDataRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: VisitDistributionDataRepository::class)]
 #[ORM\Table(name: 'wechat_visit_distribution_data', options: ['comment' => '获取用户小程序访问分布数据'])]
 #[ORM\UniqueConstraint(name: 'wechat_visit_distribution_data_uniq', columns: ['date', 'account_id', 'type', 'scene_id', 'scene_id_pv'])]
-class VisitDistributionData implements AdminArrayInterface
-, \Stringable{
+class VisitDistributionData implements AdminArrayInterface, \Stringable
+{
     use SnowflakeKeyAware;
     use CreateTimeAware;
 
-
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '日期'])]
-    private ?\DateTimeInterface $date = null;
+    #[Assert\Type(type: \DateTimeImmutable::class)]
+    private ?\DateTimeImmutable $date = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '类型'])]
+    #[Assert\Length(max: 255)]
     private ?string $type = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '场景 ID'])]
+    #[Assert\Length(max: 255)]
     private ?string $sceneId = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '场景 ID PV'])]
+    #[Assert\Length(max: 255)]
     private ?string $sceneIdPv = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
 
-
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [
@@ -76,14 +90,12 @@ class VisitDistributionData implements AdminArrayInterface
         $this->type = $type;
     }
 
-    public function setDate(?\DateTimeInterface $date): self
+    public function setDate(?\DateTimeImmutable $date): void
     {
         $this->date = $date;
-
-        return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
@@ -93,11 +105,9 @@ class VisitDistributionData implements AdminArrayInterface
         return $this->account;
     }
 
-    public function setAccount(?Account $account): self
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
     public function __toString(): string

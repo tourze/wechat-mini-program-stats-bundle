@@ -1,53 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use WechatMiniProgramStatsBundle\Repository\DailyPageVisitDataRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: DailyPageVisitDataRepository::class)]
 #[ORM\Table(name: 'wechat_daily_page_visit_data', options: ['comment' => '每日页面请求汇总日志'])]
 #[ORM\UniqueConstraint(name: 'wechat_daily_page_visit_data_idx_uniq', columns: ['date', 'page'])]
-class DailyPageVisitData implements AdminArrayInterface
-, \Stringable{
+class DailyPageVisitData implements AdminArrayInterface, \Stringable
+{
+    use TimestampableAware;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
-    private ?int $id = 0;
+    private int $id = 0;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '日期'])]
-    private ?\DateTimeInterface $date = null;
+    #[Assert\Type(type: \DateTimeImmutable::class)]
+    private ?\DateTimeImmutable $date = null;
 
+    #[ORM\Column(type: Types::STRING, length: 500, options: ['comment' => '页面路径'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 500)]
     private string $page;
 
+    #[ORM\Column(type: Types::INTEGER, options: ['comment' => '访问PV'])]
+    #[Assert\NotNull]
+    #[Assert\PositiveOrZero]
     private int $visitPv;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '访问UV'])]
+    #[Assert\PositiveOrZero]
     private ?int $visitUv;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '新用户访问PV'])]
+    #[Assert\PositiveOrZero]
     private ?int $newUserVisitPv;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '新用户访问UV'])]
+    #[Assert\PositiveOrZero]
     private ?int $newUserVisitUv;
-
-    use TimestampableAware;
 
     public function getPage(): string
     {
         return $this->page;
     }
 
-    public function setPage(string $page): self
+    public function setPage(string $page): void
     {
         $this->page = $page;
-
-        return $this;
     }
 
     public function getVisitPv(): int
@@ -55,11 +72,9 @@ class DailyPageVisitData implements AdminArrayInterface
         return $this->visitPv;
     }
 
-    public function setVisitPv(int $visitPv): self
+    public function setVisitPv(int $visitPv): void
     {
         $this->visitPv = $visitPv;
-
-        return $this;
     }
 
     public function getVisitUv(): ?int
@@ -92,18 +107,29 @@ class DailyPageVisitData implements AdminArrayInterface
         $this->newUserVisitUv = $newUserVisitUv;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): static
+    public function setDate(?\DateTimeImmutable $date): void
     {
         $this->date = $date;
-
-        return $this;
     }
 
+    public function setCreateTime(?\DateTimeImmutable $createTime): void
+    {
+        $this->createTime = $createTime;
+    }
+
+    public function setUpdateTime(?\DateTimeImmutable $updateTime): void
+    {
+        $this->updateTime = $updateTime;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [

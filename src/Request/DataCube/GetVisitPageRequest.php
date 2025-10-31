@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Request\DataCube;
 
 use Carbon\CarbonInterface;
@@ -22,6 +24,9 @@ class GetVisitPageRequest extends WithAccountRequest
         return '/datacube/getweanalysisappidvisitpage';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         $json = [

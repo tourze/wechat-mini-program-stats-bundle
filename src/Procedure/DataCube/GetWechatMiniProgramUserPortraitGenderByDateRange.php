@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Procedure\DataCube;
 
 use Carbon\CarbonImmutable;
@@ -38,10 +40,25 @@ class GetWechatMiniProgramUserPortraitGenderByDateRange extends CacheableProcedu
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if ($account === null) {
+        if (null === $account) {
             throw new ApiException('找不到小程序');
         }
 
+        $dateArr = $this->generateDateArray();
+        $maleRow = $this->getGenderData($account, $dateArr, '男');
+        $femaleRow = $this->getGenderData($account, $dateArr, '女');
+
+        return [
+            'male' => $this->processGenderResults($maleRow),
+            'female' => $this->processGenderResults($femaleRow),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function generateDateArray(): array
+    {
         $dateArr = [];
         $date = CarbonImmutable::parse($this->startDate);
         while ($date->lte(CarbonImmutable::parse($this->endDate))) {
@@ -49,52 +66,67 @@ class GetWechatMiniProgramUserPortraitGenderByDateRange extends CacheableProcedu
             $date = $date->addDay();
         }
 
-        $maleRow = $this->repository->createQueryBuilder('t')
+        return $dateArr;
+    }
+
+    /**
+     * @param string[] $dateArr
+     */
+    private function getGenderData(object $account, array $dateArr, string $gender): mixed
+    {
+        return $this->repository->createQueryBuilder('t')
             ->where('t.account = :account and t.date in (:date) and t.type = :type and t.name = :name')
             ->setParameter('account', $account)
             ->setParameter('date', $dateArr)
             ->setParameter('type', 'visit_uv')
-            ->setParameter('name', '男')
+            ->setParameter('name', $gender)
             ->orderBy('t.date')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
+    }
 
-        $femaleRow = $this->repository->createQueryBuilder('t')
-            ->where('t.account = :account and t.date in (:date) and t.type = :type and t.name = :name')
-            ->setParameter('account', $account)
-            ->setParameter('date', $dateArr)
-            ->setParameter('type', 'visit_uv')
-            ->setParameter('name', '女')
-            ->orderBy('t.date')
-            ->getQuery()
-            ->getResult();
-
-        $male = [];
-        foreach ($maleRow as $item) {
-            $male[] = [
-                'date' => $item->getDate(),
-                'value' => $item->getValue(),
-            ];
+    /**
+     * @return array<array{date: mixed, value: mixed}>
+     */
+    private function processGenderResults(mixed $results): array
+    {
+        $processed = [];
+        if (is_iterable($results)) {
+            foreach ($results as $item) {
+                if (is_object($item) && method_exists($item, 'getDate') && method_exists($item, 'getValue')) {
+                    $processed[] = [
+                        'date' => $item->getDate(),
+                        'value' => $item->getValue(),
+                    ];
+                }
+            }
         }
 
-        $female = [];
-        foreach ($femaleRow as $item) {
-            $female[] = [
-                'date' => $item->getDate(),
-                'value' => $item->getValue(),
-            ];
-        }
-
-        return [
-            'male' => $male,
-            'female' => $female,
-        ];
+        return $processed;
     }
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramUserPortraitGenderByDateRange_{$request->getParams()->get('accountId')}_" .
-            CarbonImmutable::parse($request->getParams()->get('startDate'))->startOfDay() . '_' . CarbonImmutable::parse($request->getParams()->get('endDate'))->startOfDay();
+        $params = $request->getParams();
+        if (null === $params) {
+            return 'GetWechatMiniProgramUserPortraitGenderByDateRange_default';
+        }
+
+        $accountId = $params->get('accountId') ?? 'unknown';
+        $startDate = $params->get('startDate');
+        $endDate = $params->get('endDate');
+
+        if (!is_string($accountId) && !is_numeric($accountId)) {
+            $accountId = 'unknown';
+        }
+
+        if (!is_string($startDate) || !is_string($endDate)) {
+            return "GetWechatMiniProgramUserPortraitGenderByDateRange_{$accountId}_invalid_dates";
+        }
+
+        return "GetWechatMiniProgramUserPortraitGenderByDateRange_{$accountId}_" .
+            CarbonImmutable::parse($startDate)->startOfDay() . '_' . CarbonImmutable::parse($endDate)->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int
@@ -102,8 +134,11 @@ class GetWechatMiniProgramUserPortraitGenderByDateRange extends CacheableProcedu
         return 60 * 60;
     }
 
+    /**
+     * @return iterable<string>
+     */
     public function getCacheTags(JsonRpcRequest $request): iterable
     {
-        yield null;
+        yield 'wechat_user_portrait';
     }
 }

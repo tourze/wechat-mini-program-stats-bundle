@@ -6,6 +6,8 @@ services:
 
   WechatMiniProgramStatsBundle\Command\:
     resource: '../../Command/'
+  WechatMiniProgramStatsBundle\Controller\:
+    resource: '../../Controller/'
   WechatMiniProgramStatsBundle\EventSubscriber\:
     resource: '../../EventSubscriber/'
   WechatMiniProgramStatsBundle\MessageHandler\:
@@ -16,3 +18,4 @@ services:
     resource: '../../Repository/'
   WechatMiniProgramStatsBundle\Service\:
     resource: '../../Service/'
+

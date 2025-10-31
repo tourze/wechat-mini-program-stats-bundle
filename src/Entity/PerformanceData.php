@@ -1,43 +1,60 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Repository\PerformanceDataRepository;
 
+/**
+ * @implements AdminArrayInterface<string, mixed>
+ */
 #[ORM\Entity(repositoryClass: PerformanceDataRepository::class)]
 #[ORM\Table(name: 'wechat_performance_data', options: ['comment' => '获取小程序性能数据'])]
-#[ORM\UniqueConstraint(name: 'wechat_daily_retain_idx_uniq', columns: ['date', 'account_id', 'description'])]
-class PerformanceData implements AdminArrayInterface
-, \Stringable{
+#[ORM\UniqueConstraint(name: 'wechat_performance_data_idx_uniq', columns: ['date', 'account_id', 'description'])]
+class PerformanceData implements AdminArrayInterface, \Stringable
+{
     use SnowflakeKeyAware;
     use CreateTimeAware;
 
-
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '模块'])]
+    #[Assert\Length(max: 255)]
     private ?string $module = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '网络类型'])]
+    #[Assert\Length(max: 255)]
     private ?string $networkType = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '设备级别'])]
+    #[Assert\Length(max: 255)]
     private ?string $deviceLevel = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '指标ID'])]
+    #[Assert\Length(max: 255)]
     private ?string $metricsId = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '描述'])]
+    #[Assert\Length(max: 255)]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '日期'])]
-    private ?\DateTimeInterface $date = null;
+    #[Assert\Type(type: \DateTimeImmutable::class)]
+    private ?\DateTimeImmutable $date = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['comment' => '值'])]
+    #[Assert\Length(max: 255)]
     private ?string $value = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Account $account = null;
-
 
     public function getMetricsId(): ?string
     {
@@ -79,14 +96,12 @@ class PerformanceData implements AdminArrayInterface
         $this->value = $value;
     }
 
-    public function setDate(?\DateTimeInterface $date): self
+    public function setDate(?\DateTimeImmutable $date): void
     {
         $this->date = $date;
-
-        return $this;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
@@ -116,13 +131,14 @@ class PerformanceData implements AdminArrayInterface
         return $this->account;
     }
 
-    public function setAccount(?Account $account): self
+    public function setAccount(?Account $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function retrieveAdminArray(): array
     {
         return [

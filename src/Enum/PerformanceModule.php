@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Enum;
 
 use Tourze\EnumExtra\Itemable;

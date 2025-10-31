@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramStatsBundle\Procedure;
 
 use Carbon\CarbonImmutable;
@@ -11,7 +13,9 @@ use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
 use Tourze\JsonRPCCacheBundle\Procedure\CacheableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
+use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramBundle\Repository\AccountRepository;
+use WechatMiniProgramStatsBundle\Entity\DailyRetainData;
 use WechatMiniProgramStatsBundle\Repository\DailyRetainDataRepository;
 
 #[Log]
@@ -32,66 +36,141 @@ class GetWechatMiniProgramRetainUserByDate extends CacheableProcedure
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function execute(): array
     {
         $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
-        if ($account === null) {
+        if (null === $account) {
             throw new ApiException('找不到小程序');
         }
 
-        $visitUv = $this->repository->findOneBy([
-            'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->startOfDay(),
-            'type' => 'visit_uv',
-        ]);
-
-        $visitUvNew = $this->repository->findOneBy([
-            'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->startOfDay(),
-            'type' => 'visit_uv_new',
-        ]);
-
-        $beforeVisitUv = $this->repository->findOneBy([
-            'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->subDay()->startOfDay(),
-            'type' => 'visit_uv',
-        ]);
-
-        $beforeVisitUvNew = $this->repository->findOneBy([
-            'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->subDay()->startOfDay(),
-            'type' => 'visit_uv_new',
-        ]);
-
-        $beforeSevenVisitUv = $this->repository->findOneBy([
-            'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->subDays(7)->startOfDay(),
-            'type' => 'visit_uv',
-        ]);
-
-        $beforeSevenVisitUvNew = $this->repository->findOneBy([
-            'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->subDays(7)->startOfDay(),
-            'type' => 'visit_uv_new',
-        ]);
-
-        $res = [
-            'visitUv' => ($visitUv !== null) ? $visitUv->getUserNumber() : 0,  // 活跃用户留存
-            'visitUvNew' => ($visitUvNew !== null) ? $visitUvNew->getUserNumber() : 0, // 新增用户留存
-        ];
+        $currentDate = CarbonImmutable::parse($this->date)->startOfDay();
+        $currentData = $this->getCurrentRetainData($account, $currentDate);
+        $dailyComparisons = $this->calculateDailyComparisons($account, $currentDate, $currentData);
+        $weeklyComparisons = $this->calculateWeeklyComparisons($account, $currentDate, $currentData);
 
         return [
-            ...$res,
-            'visitUvCompare' => ($beforeVisitUv !== null && $beforeVisitUv->getUserNumber() !== null) ? round(($res['visitUv'] - (int) $beforeVisitUv->getUserNumber()) / (int) $beforeVisitUv->getUserNumber(), 4) : null,
-            'visitUvNewCompare' => ($beforeVisitUvNew !== null && $beforeVisitUvNew->getUserNumber() !== null) ? round(($res['visitUvNew'] - (int) $beforeVisitUvNew->getUserNumber()) / (int) $beforeVisitUvNew->getUserNumber(), 4) : null,
-            'visitUvSevenCompare' => ($beforeSevenVisitUv !== null && $beforeSevenVisitUv->getUserNumber() !== null) ? round(($res['visitUv'] - (int) $beforeSevenVisitUv->getUserNumber()) / (int) $beforeSevenVisitUv->getUserNumber(), 4) : null,
-            'visitUvNewSevenCompare' => ($beforeSevenVisitUvNew !== null && $beforeSevenVisitUvNew->getUserNumber() !== null) ? round(($res['visitUvNew'] - (int) $beforeSevenVisitUvNew->getUserNumber()) / (int) $beforeSevenVisitUvNew->getUserNumber(), 4) : null,
+            ...$currentData,
+            ...$dailyComparisons,
+            ...$weeklyComparisons,
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getCurrentRetainData(Account $account, CarbonImmutable $date): array
+    {
+        /** @var DailyRetainData|null $visitUv */
+        $visitUv = $this->repository->findOneBy([
+            'account' => $account,
+            'date' => $date,
+            'type' => 'visit_uv',
+        ]);
+
+        /** @var DailyRetainData|null $visitUvNew */
+        $visitUvNew = $this->repository->findOneBy([
+            'account' => $account,
+            'date' => $date,
+            'type' => 'visit_uv_new',
+        ]);
+
+        return [
+            'visitUv' => (null !== $visitUv) ? (int) $visitUv->getUserNumber() : 0,
+            'visitUvNew' => (null !== $visitUvNew) ? (int) $visitUvNew->getUserNumber() : 0,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $currentData
+     * @return array<string, mixed>
+     */
+    private function calculateDailyComparisons(Account $account, CarbonImmutable $currentDate, array $currentData): array
+    {
+        $previousDate = $currentDate->subDay();
+        $beforeVisitUv = $this->findRetainData($account, $previousDate, 'visit_uv');
+        $beforeVisitUvNew = $this->findRetainData($account, $previousDate, 'visit_uv_new');
+
+        return [
+            'visitUvCompare' => $this->calculatePercentageChange($this->ensureInt($currentData['visitUv']), $beforeVisitUv?->getUserNumber()),
+            'visitUvNewCompare' => $this->calculatePercentageChange($this->ensureInt($currentData['visitUvNew']), $beforeVisitUvNew?->getUserNumber()),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $currentData
+     * @return array<string, mixed>
+     */
+    private function calculateWeeklyComparisons(Account $account, CarbonImmutable $currentDate, array $currentData): array
+    {
+        $sevenDaysAgo = $currentDate->subDays(7);
+        $beforeSevenVisitUv = $this->findRetainData($account, $sevenDaysAgo, 'visit_uv');
+        $beforeSevenVisitUvNew = $this->findRetainData($account, $sevenDaysAgo, 'visit_uv_new');
+
+        return [
+            'visitUvSevenCompare' => $this->calculatePercentageChange($this->ensureInt($currentData['visitUv']), $beforeSevenVisitUv?->getUserNumber()),
+            'visitUvNewSevenCompare' => $this->calculatePercentageChange($this->ensureInt($currentData['visitUvNew']), $beforeSevenVisitUvNew?->getUserNumber()),
+        ];
+    }
+
+    private function findRetainData(Account $account, CarbonImmutable $date, string $type): ?DailyRetainData
+    {
+        return $this->repository->findOneBy([
+            'account' => $account,
+            'date' => $date,
+            'type' => $type,
+        ]);
+
+        /** @var DailyRetainData|null $result */
+    }
+
+    private function ensureInt(mixed $value): int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+        if (is_numeric($value)) {
+            return (int) $value;
+        }
+
+        return 0;
+    }
+
+    private function calculatePercentageChange(int $current, mixed $previous): ?float
+    {
+        if (null === $previous) {
+            return null;
+        }
+
+        $previousInt = is_numeric($previous) ? (int) $previous : 0;
+        if (0 === $previousInt) {
+            return null;
+        }
+
+        return round(($current - $previousInt) / $previousInt, 4);
     }
 
     public function getCacheKey(JsonRpcRequest $request): string
     {
-        return "GetWechatMiniProgramRetainUserByDate_{$request->getParams()->get('accountId')}_" . CarbonImmutable::parse($request->getParams()->get('date'))->startOfDay();
+        $params = $request->getParams();
+        if (null === $params) {
+            throw new \InvalidArgumentException('Request params cannot be null');
+        }
+
+        $accountId = $params->get('accountId') ?? 'unknown';
+        $date = $params->get('date');
+
+        if (!is_string($accountId) && !is_numeric($accountId)) {
+            $accountId = 'unknown';
+        }
+
+        if (!is_string($date)) {
+            return "GetWechatMiniProgramRetainUserByDate_{$accountId}_invalid_date";
+        }
+
+        return "GetWechatMiniProgramRetainUserByDate_{$accountId}_" . CarbonImmutable::parse($date)->startOfDay();
     }
 
     public function getCacheDuration(JsonRpcRequest $request): int
@@ -99,8 +178,11 @@ class GetWechatMiniProgramRetainUserByDate extends CacheableProcedure
         return 60 * 60;
     }
 
+    /**
+     * @return iterable<string>
+     */
     public function getCacheTags(JsonRpcRequest $request): iterable
     {
-        yield null;
+        yield 'wechat_stats';
     }
 }
