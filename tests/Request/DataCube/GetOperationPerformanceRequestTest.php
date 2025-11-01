@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace WechatMiniProgramStatsBundle\Tests\Request\DataCube;
 
+use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use HttpClientBundle\Tests\Request\RequestTestCase;
 use WechatMiniProgramStatsBundle\Request\DataCube\GetOperationPerformanceRequest;
 
 /**
