@@ -32,7 +32,7 @@
     "tourze/doctrine-async-insert-bundle": "1.0.*",
     "tourze/doctrine-snowflake-bundle": "1.0.*",
     "tourze/doctrine-timestamp-bundle": "1.0.*",
-    "tourze/doctrine-upsert-bundle": "0.1.*",
+    "tourze/doctrine-upsert-bundle": "1.0.*",
     "tourze/easy-admin-menu-bundle": "1.0.*",
     "tourze/enum-extra": "1.*",
     "tourze/http-client-bundle": "0.1.*",
@@ -41,7 +41,7 @@
     "tourze/json-rpc-log-bundle": "0.1.*",
     "tourze/symfony-cron-job-bundle": "1.0.*",
     "tourze/symfony-dependency-service-loader": "1.*",
-    "tourze/symfony-lock-command-bundle": "0.0.*",
+    "tourze/symfony-lock-command-bundle": "1.0.*",
     "tourze/wechat-mini-program-bundle": "0.1.*"
   },
   "require-dev": {
