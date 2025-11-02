@@ -117,16 +117,6 @@ class DailyPageVisitData implements AdminArrayInterface, \Stringable
         $this->date = $date;
     }
 
-    public function setCreateTime(?\DateTimeImmutable $createTime): void
-    {
-        $this->createTime = $createTime;
-    }
-
-    public function setUpdateTime(?\DateTimeImmutable $updateTime): void
-    {
-        $this->updateTime = $updateTime;
-    }
-
     /**
      * @return array<string, mixed>
      */
