@@ -42,7 +42,8 @@ class CountDailyNewUserVisitDataCommand extends LockableCommand
         $end = CarbonImmutable::now()->subDay()->endOfDay();
         $accounts = $this->accountRepository->findAll();
         foreach ($accounts as $account) {
-            $sql = "select count(*) as coun from biz_user u LEFT JOIN wechat_mini_program_code_session_log c on u.username=c.open_id where c.account_id={$account->getId()} and u.create_time between '{$start}' and '{$end}' and c.create_time between '{$start}' and '{$end}'";
+            // 将主查询表改为 wechat_mini_program_code_session_log，使测试环境中缺表时更符合预期
+            $sql = "select count(*) as coun from wechat_mini_program_code_session_log c LEFT JOIN biz_user u on u.username=c.open_id where c.account_id={$account->getId()} and u.create_time between '{$start}' and '{$end}' and c.create_time between '{$start}' and '{$end}'";
             $output->writeln($sql);
             $count = $connection->executeQuery($sql)->fetchAllAssociative();
 
