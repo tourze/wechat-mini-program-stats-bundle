@@ -15,6 +15,7 @@ use Tourze\JsonRPCLogBundle\JsonRPCLogBundle;
 use Tourze\LockCommandBundle\LockCommandBundle;
 use Tourze\Symfony\CronJob\CronJobBundle;
 use WechatMiniProgramBundle\WechatMiniProgramBundle;
+use Tourze\EasyAdminMenuBundle\EasyAdminMenuBundle;
 
 class WechatMiniProgramStatsBundle extends Bundle implements BundleDependencyInterface
 {
@@ -30,6 +31,7 @@ class WechatMiniProgramStatsBundle extends Bundle implements BundleDependencyInt
             CronJobBundle::class => ['all' => true],
             LockCommandBundle::class => ['all' => true],
             WechatMiniProgramBundle::class => ['all' => true],
+            EasyAdminMenuBundle::class => ['all' => true],
         ];
     }
 }
