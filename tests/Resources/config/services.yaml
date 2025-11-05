@@ -1,5 +1,0 @@
-services:
-  # 为测试环境提供 AsyncInsertService 的 Mock 实现
-  Tourze\DoctrineAsyncInsertBundle\Service\AsyncInsertService:
-    class: WechatMiniProgramStatsBundle\Tests\Mock\AsyncInsertServiceMock
-    public: true
