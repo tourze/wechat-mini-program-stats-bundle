@@ -35,11 +35,11 @@
     "tourze/doctrine-upsert-bundle": "1.0.*",
     "tourze/easy-admin-menu-bundle": "1.0.*",
     "tourze/enum-extra": "1.0.*",
-    "tourze/http-client-bundle": "1.0.*",
+    "tourze/http-client-bundle": "1.1.*",
     "tourze/json-rpc-cache-bundle": "1.0.*",
     "tourze/json-rpc-core": "1.0.*",
     "tourze/json-rpc-log-bundle": "1.0.*",
-    "tourze/symfony-cron-job-bundle": "1.0.*",
+    "tourze/symfony-cron-job-bundle": "1.1.*",
     "tourze/symfony-dependency-service-loader": "1.0.*",
     "tourze/symfony-lock-command-bundle": "1.0.*",
     "tourze/wechat-mini-program-bundle": "1.0.*"
