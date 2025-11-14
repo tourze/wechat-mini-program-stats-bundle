@@ -363,7 +363,7 @@ class GetPerformanceDataCommand extends LockableCommand
     }
 
     /**
-     * @param array<mixed, mixed> $res
+     * @param array<string, mixed> $res
      * @param array<string, array<string, string>> $paramsValue
      */
     private function savePerformanceData(array $res, array $paramsValue, int $moduleValue, Account $account): void
