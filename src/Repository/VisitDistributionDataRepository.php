@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Entity\VisitDistributionData;
  * @extends ServiceEntityRepository<VisitDistributionData>
  */
 #[AsRepository(entityClass: VisitDistributionData::class)]
-class VisitDistributionDataRepository extends ServiceEntityRepository
+final class VisitDistributionDataRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

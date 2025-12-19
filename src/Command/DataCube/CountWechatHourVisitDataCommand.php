@@ -16,7 +16,7 @@ use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 #[AsCronTask(expression: '13 * * * *')]
 #[AsCommand(name: self::NAME, description: '统计小程序每小时访问情况')]
 #[Autoconfigure(public: true)]
-class CountWechatHourVisitDataCommand extends LockableCommand
+final class CountWechatHourVisitDataCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:count-wechat-hour-visit-data';
     //    public function __construct(

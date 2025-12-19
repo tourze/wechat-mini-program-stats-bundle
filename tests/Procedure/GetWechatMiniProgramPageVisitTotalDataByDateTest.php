@@ -7,8 +7,9 @@ namespace WechatMiniProgramStatsBundle\Tests\Procedure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramPageVisitTotalDataByDateParam;
 use WechatMiniProgramStatsBundle\Procedure\GetWechatMiniProgramPageVisitTotalDataByDate;
 
 /**
@@ -31,12 +32,15 @@ final class GetWechatMiniProgramPageVisitTotalDataByDateTest extends AbstractPro
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramPageVisitTotalDataByDate::class);
-        $procedure->accountId = 'invalid-account';
+        $param = new GetWechatMiniProgramPageVisitTotalDataByDateParam(
+            accountId: 'invalid-account',
+            date: ''
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidData(): void
@@ -50,10 +54,12 @@ final class GetWechatMiniProgramPageVisitTotalDataByDateTest extends AbstractPro
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramPageVisitTotalDataByDate::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->date = '2024-01-01';
+        $param = new GetWechatMiniProgramPageVisitTotalDataByDateParam(
+            accountId: (string) $account->getId(),
+            date: '2024-01-01'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
         $expected = [
             'total' => null,
@@ -61,6 +67,6 @@ final class GetWechatMiniProgramPageVisitTotalDataByDateTest extends AbstractPro
             'totalSevenCompare' => null,
         ];
 
-        self::assertEquals($expected, $result);
+        self::assertEquals($expected, $result->toArray());
     }
 }

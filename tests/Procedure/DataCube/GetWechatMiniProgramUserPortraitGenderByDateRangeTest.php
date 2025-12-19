@@ -8,9 +8,10 @@ use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitGendersData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramUserPortraitGenderByDateRangeParam;
 use WechatMiniProgramStatsBundle\Procedure\DataCube\GetWechatMiniProgramUserPortraitGenderByDateRange;
 
 /**
@@ -53,14 +54,16 @@ final class GetWechatMiniProgramUserPortraitGenderByDateRangeTest extends Abstra
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramUserPortraitGenderByDateRange::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->startDate = '2023-01-01';
-        $procedure->endDate = '2023-01-07';
+        $param = new GetWechatMiniProgramUserPortraitGenderByDateRangeParam(
+            accountId: 'invalid-account',
+            startDate: '2023-01-01',
+            endDate: '2023-01-07'
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidData(): void
@@ -93,17 +96,19 @@ final class GetWechatMiniProgramUserPortraitGenderByDateRangeTest extends Abstra
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramUserPortraitGenderByDateRange::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->startDate = '2023-01-01';
-        $procedure->endDate = '2023-01-02';
+        $param = new GetWechatMiniProgramUserPortraitGenderByDateRangeParam(
+            accountId: (string) $account->getId(),
+            startDate: '2023-01-01',
+            endDate: '2023-01-02'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
         $expected = [
             'male' => [['date' => '20230101', 'value' => '100']],
             'female' => [['date' => '20230101', 'value' => '80']],
         ];
 
-        self::assertEquals($expected, $result);
+        self::assertEquals($expected, $result->toArray());
     }
 }

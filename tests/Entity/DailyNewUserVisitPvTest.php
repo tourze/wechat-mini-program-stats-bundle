@@ -95,11 +95,9 @@ final class DailyNewUserVisitPvTest extends AbstractEntityTestCase
 
     public function testAccountGetterAndSetter(): void
     {
-        // 必须使用具体类 Account 而不是接口的原因：
-        // 理由1：Account 是 Doctrine Entity 类，代表微信小程序账户实体，没有对应的接口定义
-        // 理由2：测试需要模拟 DailyNewUserVisitPv 实体与账户的关联关系，验证 getter/setter 的正确性
-        // 理由3：使用 Mock 可以避免实例化完整的 Account 对象及其依赖，保持测试的轻量和快速
-        $account = $this->createMock(Account::class);
+        $account = new Account();
+        $account->setName('Test Account');
+        $account->setAppId('test_app_id');
         self::assertNull($this->dailyNewUserVisitPv->getAccount());
 
         $this->dailyNewUserVisitPv->setAccount($account);

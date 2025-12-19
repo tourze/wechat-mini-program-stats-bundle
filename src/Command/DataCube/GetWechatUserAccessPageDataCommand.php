@@ -29,7 +29,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetVisitPageRequest;
 #[AsCommand(name: self::NAME, description: '获取用户访问页面数据')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class GetWechatUserAccessPageDataCommand extends LockableCommand
+final class GetWechatUserAccessPageDataCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:get-wechat-user-access-page-data';
 

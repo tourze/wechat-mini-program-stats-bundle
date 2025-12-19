@@ -7,9 +7,10 @@ namespace WechatMiniProgramStatsBundle\Tests\Procedure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\DailyVisitTrendData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeParam;
 use WechatMiniProgramStatsBundle\Procedure\GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange;
 
 /**
@@ -32,14 +33,16 @@ final class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeTest extends 
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->startDate = '2023-01-01';
-        $procedure->endDate = '2023-01-07';
+        $param = new GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeParam(
+            accountId: 'invalid-account',
+            startDate: '2023-01-01',
+            endDate: '2023-01-07'
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidData(): void
@@ -72,16 +75,19 @@ final class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeTest extends 
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->startDate = '2023-01-01';
-        $procedure->endDate = '2023-01-07';
+        $param = new GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeParam(
+            accountId: (string) $account->getId(),
+            startDate: '2023-01-01',
+            endDate: '2023-01-07'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
+        $resultArray = $result->toArray();
 
-        self::assertArrayHasKey('sessionCntTotal', $result);
-        self::assertArrayHasKey('visitPvTotal', $result);
-        self::assertArrayHasKey('visitUvTotal', $result);
-        self::assertArrayHasKey('visitUvNewTotal', $result);
+        self::assertArrayHasKey('sessionCntTotal', $resultArray);
+        self::assertArrayHasKey('visitPvTotal', $resultArray);
+        self::assertArrayHasKey('visitUvTotal', $resultArray);
+        self::assertArrayHasKey('visitUvNewTotal', $resultArray);
     }
 
     public function testExecuteWithEmptyData(): void
@@ -95,15 +101,18 @@ final class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeTest extends 
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->startDate = '2023-01-01';
-        $procedure->endDate = '2023-01-07';
+        $param = new GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeParam(
+            accountId: (string) $account->getId(),
+            startDate: '2023-01-01',
+            endDate: '2023-01-07'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
+        $resultArray = $result->toArray();
 
-        self::assertArrayHasKey('sessionCntTotal', $result);
-        self::assertArrayHasKey('visitPvTotal', $result);
-        self::assertArrayHasKey('visitUvTotal', $result);
-        self::assertArrayHasKey('visitUvNewTotal', $result);
+        self::assertArrayHasKey('sessionCntTotal', $resultArray);
+        self::assertArrayHasKey('visitPvTotal', $resultArray);
+        self::assertArrayHasKey('visitUvTotal', $resultArray);
+        self::assertArrayHasKey('visitUvNewTotal', $resultArray);
     }
 }

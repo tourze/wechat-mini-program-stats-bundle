@@ -30,7 +30,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetOperationPerformanceRequest
 #[AsCommand(name: self::NAME, description: '运维中心-查询性能数据')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class SyncGetOperationPerformanceCommand extends Command
+final class SyncGetOperationPerformanceCommand extends Command
 {
     public const NAME = 'wechat-mini-program:operation-performance:sync';
 

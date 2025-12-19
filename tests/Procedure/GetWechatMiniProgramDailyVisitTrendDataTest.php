@@ -7,9 +7,10 @@ namespace WechatMiniProgramStatsBundle\Tests\Procedure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\DailyVisitTrendData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramDailyVisitTrendDataParam;
 use WechatMiniProgramStatsBundle\Procedure\GetWechatMiniProgramDailyVisitTrendData;
 
 /**
@@ -32,13 +33,15 @@ final class GetWechatMiniProgramDailyVisitTrendDataTest extends AbstractProcedur
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramDailyVisitTrendData::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->date = '2023-01-01';
+        $param = new GetWechatMiniProgramDailyVisitTrendDataParam(
+            accountId: 'invalid-account',
+            date: '2023-01-01'
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidData(): void
@@ -80,19 +83,22 @@ final class GetWechatMiniProgramDailyVisitTrendDataTest extends AbstractProcedur
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramDailyVisitTrendData::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->date = '2023-01-10';
+        $param = new GetWechatMiniProgramDailyVisitTrendDataParam(
+            accountId: (string) $account->getId(),
+            date: '2023-01-10'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
+        $resultArray = $result->toArray();
 
-        self::assertArrayHasKey('sessionCnt', $result);
-        self::assertArrayHasKey('visitPv', $result);
-        self::assertArrayHasKey('visitUv', $result);
-        self::assertArrayHasKey('visitUvNew', $result);
-        self::assertEquals(100, $result['sessionCnt']);
-        self::assertEquals(200, $result['visitPv']);
-        self::assertEquals(80, $result['visitUv']);
-        self::assertEquals(20, $result['visitUvNew']);
+        self::assertArrayHasKey('sessionCnt', $resultArray);
+        self::assertArrayHasKey('visitPv', $resultArray);
+        self::assertArrayHasKey('visitUv', $resultArray);
+        self::assertArrayHasKey('visitUvNew', $resultArray);
+        self::assertEquals(100, $resultArray['sessionCnt']);
+        self::assertEquals(200, $resultArray['visitPv']);
+        self::assertEquals(80, $resultArray['visitUv']);
+        self::assertEquals(20, $resultArray['visitUvNew']);
     }
 
     public function testExecuteWithNoCurrentData(): void
@@ -106,12 +112,15 @@ final class GetWechatMiniProgramDailyVisitTrendDataTest extends AbstractProcedur
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramDailyVisitTrendData::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->date = '2023-01-10';
+        $param = new GetWechatMiniProgramDailyVisitTrendDataParam(
+            accountId: (string) $account->getId(),
+            date: '2023-01-10'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
+        $resultArray = $result->toArray();
 
-        self::assertArrayHasKey('sessionCnt', $result);
-        self::assertEquals(0, $result['sessionCnt']);
+        self::assertArrayHasKey('sessionCnt', $resultArray);
+        self::assertEquals(0, $resultArray['sessionCnt']);
     }
 }

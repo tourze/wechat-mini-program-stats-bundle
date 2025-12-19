@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Entity\AccessSourceVisitUv;
  * @extends ServiceEntityRepository<AccessSourceVisitUv>
  */
 #[AsRepository(entityClass: AccessSourceVisitUv::class)]
-class AccessSourceVisitUvRepository extends ServiceEntityRepository
+final class AccessSourceVisitUvRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

@@ -7,15 +7,17 @@ namespace WechatMiniProgramStatsBundle\Procedure;
 use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
-use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
 use Tourze\JsonRPCCacheBundle\Procedure\CacheableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Entity\DailyRetainData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramRetainUserByDateParam;
 use WechatMiniProgramStatsBundle\Repository\DailyRetainDataRepository;
 
 #[Log]
@@ -24,12 +26,6 @@ use WechatMiniProgramStatsBundle\Repository\DailyRetainDataRepository;
 #[MethodExpose(method: 'GetWechatMiniProgramRetainUserByDate')]
 class GetWechatMiniProgramRetainUserByDate extends CacheableProcedure
 {
-    #[MethodParam(description: '小程序ID')]
-    public string $accountId = '';
-
-    #[MethodParam(description: '日期')]
-    public string $date = '';
-
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailyRetainDataRepository $repository,
@@ -37,25 +33,25 @@ class GetWechatMiniProgramRetainUserByDate extends CacheableProcedure
     }
 
     /**
-     * @return array<string, mixed>
+     * @phpstan-param GetWechatMiniProgramRetainUserByDateParam $param
      */
-    public function execute(): array
+    public function execute(GetWechatMiniProgramRetainUserByDateParam|RpcParamInterface $param): ArrayResult
     {
-        $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
+        $account = $this->accountRepository->findOneBy(['id' => $param->accountId, 'valid' => true]);
         if (null === $account) {
             throw new ApiException('找不到小程序');
         }
 
-        $currentDate = CarbonImmutable::parse($this->date)->startOfDay();
+        $currentDate = CarbonImmutable::parse($param->date)->startOfDay();
         $currentData = $this->getCurrentRetainData($account, $currentDate);
         $dailyComparisons = $this->calculateDailyComparisons($account, $currentDate, $currentData);
         $weeklyComparisons = $this->calculateWeeklyComparisons($account, $currentDate, $currentData);
 
-        return [
+        return new ArrayResult([
             ...$currentData,
             ...$dailyComparisons,
             ...$weeklyComparisons,
-        ];
+        ]);
     }
 
     /**

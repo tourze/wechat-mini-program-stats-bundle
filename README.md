@@ -174,7 +174,7 @@ use WechatMiniProgramStatsBundle\Command\DataCube\GetDailySummaryCommand;
 // Run daily summary collection
 $application = new Application();
 $command = $container->get(GetDailySummaryCommand::class);
-$application->add($command);
+$application->addCommand($command);
 $application->run();
 ```
 

@@ -29,7 +29,7 @@ use WechatMiniProgramStatsBundle\Request\DataAnalysis\WechatPerformanceRequest;
 #[AsCommand(name: self::NAME, description: '定期查询小程序性能指标')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class CheckWcPerformanceCommand extends Command
+final class CheckWcPerformanceCommand extends Command
 {
     public const NAME = 'wechat-mini-program:check-performance';
 

@@ -6,14 +6,16 @@ namespace WechatMiniProgramStatsBundle\Procedure;
 
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
-use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
 use Tourze\JsonRPCCacheBundle\Procedure\CacheableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
 use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Entity\DailySummaryData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramVisitTotalUserParam;
 use WechatMiniProgramStatsBundle\Repository\DailySummaryDataRepository;
 
 #[Log]
@@ -22,18 +24,18 @@ use WechatMiniProgramStatsBundle\Repository\DailySummaryDataRepository;
 #[MethodExpose(method: 'GetWechatMiniProgramVisitTotalUser')]
 class GetWechatMiniProgramVisitTotalUser extends CacheableProcedure
 {
-    #[MethodParam(description: '小程序ID')]
-    public string $accountId = '';
-
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailySummaryDataRepository $dailySummaryDataRepository,
     ) {
     }
 
-    public function execute(): array
+    /**
+     * @phpstan-param GetWechatMiniProgramVisitTotalUserParam $param
+     */
+    public function execute(GetWechatMiniProgramVisitTotalUserParam|RpcParamInterface $param): ArrayResult
     {
-        $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
+        $account = $this->accountRepository->findOneBy(['id' => $param->accountId, 'valid' => true]);
         if (null === $account) {
             throw new ApiException('找不到小程序');
         }
@@ -44,18 +46,18 @@ class GetWechatMiniProgramVisitTotalUser extends CacheableProcedure
         ], ['date' => 'DESC'], 8);
 
         if ([] === $row) {
-            return [
+            return new ArrayResult([
                 'total' => 0,
                 'totalCompare' => 0,
                 'totalSevenCompare' => 0,
-            ];
+            ]);
         }
 
-        return [
+        return new ArrayResult([
             'total' => $row[0]->getVisitTotal(),
             'totalCompare' => (isset($row[1]) && null !== $row[1]->getVisitTotal() && $row[1]->getVisitTotal() > 0) ? round(((int) $row[0]->getVisitTotal() - (int) $row[1]->getVisitTotal()) / (int) $row[1]->getVisitTotal(), 4) : 0,
             'totalSevenCompare' => (isset($row[7]) && null !== $row[7]->getVisitTotal() && $row[7]->getVisitTotal() > 0) ? round(((int) $row[0]->getVisitTotal() - (int) $row[7]->getVisitTotal()) / (int) $row[7]->getVisitTotal(), 4) : 0,
-        ];
+        ]);
     }
 
     public function getCacheKey(JsonRpcRequest $request): string

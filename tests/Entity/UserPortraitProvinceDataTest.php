@@ -107,11 +107,9 @@ final class UserPortraitProvinceDataTest extends AbstractEntityTestCase
 
     public function testAccountGetterAndSetter(): void
     {
-        // 必须使用具体类 Account 而不是接口的原因：
-        // 理由1：Account 是 Doctrine Entity 类，代表数据库中的微信账户实体，没有抽象接口层
-        // 理由2：测试需要验证 UserPortraitProvinceData 与 Account 的多对一关联关系是否正确设置
-        // 理由3：使用 Mock 可以在单元测试中模拟账户对象，避免依赖真实数据库连接和数据
-        $account = $this->createMock(Account::class);
+        $account = new Account();
+        $account->setName('Test Account');
+        $account->setAppId('test_app_id');
         self::assertNull($this->data->getAccount());
 
         $this->data->setAccount($account);
@@ -128,11 +126,9 @@ final class UserPortraitProvinceDataTest extends AbstractEntityTestCase
         $name = 'Beijing';
         $value = '100';
         $valueId = '110000';
-        // 必须使用具体类 Account 而不是接口的原因：
-        // 理由1：Account 是 Doctrine Entity 类，表示持久化的账户数据，没有相应的接口定义
-        // 理由2：测试需要验证 retrieveAdminArray() 方法能正确返回包含账户对象的数组结构
-        // 理由3：使用 Mock 可以创建一个轻量级的测试替身，无需加载完整的实体定义和关系
-        $account = $this->createMock(Account::class);
+        $account = new Account();
+        $account->setName('Test Account');
+        $account->setAppId('test_app_id');
         $createTime = new \DateTimeImmutable();
 
         // 使用反射设置私有 ID 属性

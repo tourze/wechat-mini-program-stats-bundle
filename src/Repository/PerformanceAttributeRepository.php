@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Entity\PerformanceAttribute;
  * @extends ServiceEntityRepository<PerformanceAttribute>
  */
 #[AsRepository(entityClass: PerformanceAttribute::class)]
-class PerformanceAttributeRepository extends ServiceEntityRepository
+final class PerformanceAttributeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

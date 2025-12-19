@@ -9,9 +9,10 @@ use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitGendersData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramUserPortraitGenderParam;
 use WechatMiniProgramStatsBundle\Procedure\DataCube\GetWechatMiniProgramUserPortraitGender;
 
 /**
@@ -54,13 +55,15 @@ final class GetWechatMiniProgramUserPortraitGenderTest extends AbstractProcedure
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramUserPortraitGender::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->day = 1;
+        $param = new GetWechatMiniProgramUserPortraitGenderParam(
+            accountId: 'invalid-account',
+            day: 1
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidAccountAndDay1(): void
@@ -97,10 +100,12 @@ final class GetWechatMiniProgramUserPortraitGenderTest extends AbstractProcedure
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramUserPortraitGender::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->day = 1;
+        $param = new GetWechatMiniProgramUserPortraitGenderParam(
+            accountId: (string) $account->getId(),
+            day: 1
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
         $expected = [
             'data' => [
@@ -109,7 +114,7 @@ final class GetWechatMiniProgramUserPortraitGenderTest extends AbstractProcedure
             ],
         ];
 
-        self::assertEquals($expected, $result);
+        self::assertEquals($expected, $result->toArray());
     }
 
     public function testExecuteWithEmptyDataCallsService(): void
@@ -124,12 +129,14 @@ final class GetWechatMiniProgramUserPortraitGenderTest extends AbstractProcedure
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramUserPortraitGender::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->day = 7;
+        $param = new GetWechatMiniProgramUserPortraitGenderParam(
+            accountId: (string) $account->getId(),
+            day: 7
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
-        self::assertEquals(['data' => []], $result);
+        self::assertEquals(['data' => []], $result->toArray());
     }
 
     public function testExecuteWithInvalidDay(): void
@@ -144,12 +151,14 @@ final class GetWechatMiniProgramUserPortraitGenderTest extends AbstractProcedure
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramUserPortraitGender::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->day = 99;
+        $param = new GetWechatMiniProgramUserPortraitGenderParam(
+            accountId: (string) $account->getId(),
+            day: 99
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('no data');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 }

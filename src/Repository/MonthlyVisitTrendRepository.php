@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Entity\MonthlyVisitTrend;
  * @extends ServiceEntityRepository<MonthlyVisitTrend>
  */
 #[AsRepository(entityClass: MonthlyVisitTrend::class)]
-class MonthlyVisitTrendRepository extends ServiceEntityRepository
+final class MonthlyVisitTrendRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

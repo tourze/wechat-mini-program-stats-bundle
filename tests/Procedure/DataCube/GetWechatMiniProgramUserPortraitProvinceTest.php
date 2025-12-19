@@ -8,9 +8,10 @@ use Carbon\CarbonImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\UserPortraitProvinceData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramUserPortraitProvinceParam;
 use WechatMiniProgramStatsBundle\Procedure\DataCube\GetWechatMiniProgramUserPortraitProvince;
 
 /**
@@ -33,13 +34,15 @@ final class GetWechatMiniProgramUserPortraitProvinceTest extends AbstractProcedu
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramUserPortraitProvince::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->day = 1;
+        $param = new GetWechatMiniProgramUserPortraitProvinceParam(
+            accountId: 'invalid-account',
+            day: 1
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidAccountAndDay1(): void
@@ -74,10 +77,13 @@ final class GetWechatMiniProgramUserPortraitProvinceTest extends AbstractProcedu
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramUserPortraitProvince::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->day = 1;
+        $param = new GetWechatMiniProgramUserPortraitProvinceParam(
+            accountId: (string) $account->getId(),
+            day: 1
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
+        $resultArray = $result->toArray();
 
         $expected = [
             'data' => [
@@ -87,11 +93,11 @@ final class GetWechatMiniProgramUserPortraitProvinceTest extends AbstractProcedu
         ];
 
         // 验证数据结构，不关心顺序
-        self::assertArrayHasKey('data', $result);
-        self::assertIsArray($result['data']);
-        self::assertCount(2, $result['data']);
-        self::assertContains(['name' => '北京', 'value' => '150'], $result['data']);
-        self::assertContains(['name' => '上海', 'value' => '120'], $result['data']);
+        self::assertArrayHasKey('data', $resultArray);
+        self::assertIsArray($resultArray['data']);
+        self::assertCount(2, $resultArray['data']);
+        self::assertContains(['name' => '北京', 'value' => '150'], $resultArray['data']);
+        self::assertContains(['name' => '上海', 'value' => '120'], $resultArray['data']);
     }
 
     public function testExecuteWithEmptyData(): void
@@ -105,12 +111,14 @@ final class GetWechatMiniProgramUserPortraitProvinceTest extends AbstractProcedu
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramUserPortraitProvince::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->day = 30;
+        $param = new GetWechatMiniProgramUserPortraitProvinceParam(
+            accountId: (string) $account->getId(),
+            day: 30
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
-        self::assertEquals(['data' => []], $result);
+        self::assertEquals(['data' => []], $result->toArray());
     }
 
     public function testExecuteWithInvalidDay(): void
@@ -124,12 +132,14 @@ final class GetWechatMiniProgramUserPortraitProvinceTest extends AbstractProcedu
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramUserPortraitProvince::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->day = 99;
+        $param = new GetWechatMiniProgramUserPortraitProvinceParam(
+            accountId: (string) $account->getId(),
+            day: 99
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('no data');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 }

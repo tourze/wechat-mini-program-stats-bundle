@@ -7,8 +7,9 @@ namespace WechatMiniProgramStatsBundle\Tests\Procedure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramVisitUvAverageParam;
 use WechatMiniProgramStatsBundle\Procedure\GetWechatMiniProgramVisitUvAverage;
 
 /**
@@ -31,13 +32,15 @@ final class GetWechatMiniProgramVisitUvAverageTest extends AbstractProcedureTest
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramVisitUvAverage::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->day = '7';
+        $param = new GetWechatMiniProgramVisitUvAverageParam(
+            accountId: 'invalid-account',
+            day: '7'
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidData(): void
@@ -51,13 +54,16 @@ final class GetWechatMiniProgramVisitUvAverageTest extends AbstractProcedureTest
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramVisitUvAverage::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->day = '7';
+        $param = new GetWechatMiniProgramVisitUvAverageParam(
+            accountId: (string) $account->getId(),
+            day: '7'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
+        $resultArray = $result->toArray();
 
-        self::assertArrayHasKey('average', $result);
-        self::assertArrayHasKey('compare', $result);
+        self::assertArrayHasKey('average', $resultArray);
+        self::assertArrayHasKey('compare', $resultArray);
     }
 
     public function testExecuteWithNoData(): void
@@ -71,13 +77,16 @@ final class GetWechatMiniProgramVisitUvAverageTest extends AbstractProcedureTest
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramVisitUvAverage::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->day = '7';
+        $param = new GetWechatMiniProgramVisitUvAverageParam(
+            accountId: (string) $account->getId(),
+            day: '7'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
+        $resultArray = $result->toArray();
 
-        self::assertArrayHasKey('average', $result);
-        self::assertArrayHasKey('compare', $result);
-        self::assertEquals(0, $result['average']);
+        self::assertArrayHasKey('average', $resultArray);
+        self::assertArrayHasKey('compare', $resultArray);
+        self::assertEquals(0, $resultArray['average']);
     }
 }

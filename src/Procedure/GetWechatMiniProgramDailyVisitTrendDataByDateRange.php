@@ -7,13 +7,15 @@ namespace WechatMiniProgramStatsBundle\Procedure;
 use Carbon\CarbonImmutable;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
-use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
 use Tourze\JsonRPCCacheBundle\Procedure\CacheableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
 use WechatMiniProgramBundle\Repository\AccountRepository;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam;
 use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 
 #[Log]
@@ -22,24 +24,18 @@ use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 #[MethodExpose(method: 'GetWechatMiniProgramDailyVisitTrendDataByDateRange')]
 class GetWechatMiniProgramDailyVisitTrendDataByDateRange extends CacheableProcedure
 {
-    #[MethodParam(description: '小程序ID')]
-    public string $accountId = '';
-
-    #[MethodParam(description: '开始日期')]
-    public string $startDate = '';
-
-    #[MethodParam(description: '结束日期')]
-    public string $endDate = '';
-
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailyVisitTrendDataRepository $trendDataRepository,
     ) {
     }
 
-    public function execute(): array
+    /**
+     * @phpstan-param GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam $param
+     */
+    public function execute(GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam|RpcParamInterface $param): ArrayResult
     {
-        $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
+        $account = $this->accountRepository->findOneBy(['id' => $param->accountId, 'valid' => true]);
         if (null === $account) {
             throw new ApiException('找不到小程序');
         }
@@ -47,8 +43,8 @@ class GetWechatMiniProgramDailyVisitTrendDataByDateRange extends CacheableProced
         $row = $this->trendDataRepository->createQueryBuilder('t')
             ->where('t.account = :account and t.date between :start and :end')
             ->setParameter('account', $account)
-            ->setParameter('start', CarbonImmutable::parse($this->startDate)->startOfDay())
-            ->setParameter('end', CarbonImmutable::parse($this->endDate)->startOfDay())
+            ->setParameter('start', CarbonImmutable::parse($param->startDate)->startOfDay())
+            ->setParameter('end', CarbonImmutable::parse($param->endDate)->startOfDay())
             ->getQuery()
             ->getResult()
         ;
@@ -62,7 +58,7 @@ class GetWechatMiniProgramDailyVisitTrendDataByDateRange extends CacheableProced
             }
         }
 
-        return ['data' => $list];
+        return new ArrayResult(['data' => $list]);
     }
 
     public function getCacheKey(JsonRpcRequest $request): string

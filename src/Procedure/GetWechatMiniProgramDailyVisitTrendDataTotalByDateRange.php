@@ -9,11 +9,14 @@ use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
-use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
 use Tourze\JsonRPCCacheBundle\Procedure\CacheableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeParam;
 
 #[Log]
 #[MethodTag(name: '微信小程序')]
@@ -22,45 +25,42 @@ use Tourze\JsonRPCLogBundle\Attribute\Log;
 #[WithMonologChannel(channel: 'procedure')]
 class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableProcedure
 {
-    #[MethodParam(description: '小程序ID')]
-    public string $accountId = '';
-
-    #[MethodParam(description: '开始日期')]
-    public string $startDate = '';
-
-    #[MethodParam(description: '结束日期')]
-    public string $endDate = '';
-
     public function __construct(
         private readonly GetWechatMiniProgramDailyVisitTrendDataByDateRange $logic,
         private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function execute(): array
+    /**
+     * @phpstan-param GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeParam $param
+     */
+    public function execute(GetWechatMiniProgramDailyVisitTrendDataTotalByDateRangeParam|RpcParamInterface $param): ArrayResult
     {
-        $this->logic->accountId = $this->accountId;
-        $this->logic->startDate = $this->startDate;
-        $this->logic->endDate = $this->endDate;
+        $logicParam = new GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam(
+            accountId: $param->accountId,
+            startDate: $param->startDate,
+            endDate: $param->endDate,
+        );
 
         $startTime = microtime(true);
         $this->logger->info('调用外部系统获取日趋势数据', [
-            'accountId' => $this->accountId,
-            'startDate' => $this->startDate,
-            'endDate' => $this->endDate,
+            'accountId' => $param->accountId,
+            'startDate' => $param->startDate,
+            'endDate' => $param->endDate,
         ]);
 
         try {
             // @audit-logged 已在上层实现完整的审计日志记录（调用前后、成功失败、耗时异常等）
-            $list = $this->logic->execute();
+            $listResult = $this->logic->execute($logicParam);
+            $list = $listResult->toArray()['data'] ?? [];
             $this->logger->info('外部系统调用成功', [
-                'accountId' => $this->accountId,
+                'accountId' => $param->accountId,
                 'resultCount' => count($list),
                 'duration' => microtime(true) - $startTime,
             ]);
         } catch (\Throwable $e) {
             $this->logger->error('外部系统调用失败', [
-                'accountId' => $this->accountId,
+                'accountId' => $param->accountId,
                 'duration' => microtime(true) - $startTime,
                 'exception' => $e->getMessage(),
             ]);
@@ -79,28 +79,32 @@ class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableP
             'visitUvNewTotal' => array_sum($visitUvNewArr),
         ];
 
-        $day = CarbonImmutable::parse($this->startDate)->diffInDays(CarbonImmutable::parse($this->endDate));
-        $this->logic->startDate = CarbonImmutable::parse($this->startDate)->subDays($day)->format('Y-m-d');
-        $this->logic->endDate = CarbonImmutable::parse($this->endDate)->subDays($day)->format('Y-m-d');
+        $day = CarbonImmutable::parse($param->startDate)->diffInDays(CarbonImmutable::parse($param->endDate));
+        $beforeLogicParam = new GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam(
+            accountId: $param->accountId,
+            startDate: CarbonImmutable::parse($param->startDate)->subDays($day)->format('Y-m-d'),
+            endDate: CarbonImmutable::parse($param->endDate)->subDays($day)->format('Y-m-d'),
+        );
 
         $beforeStartTime = microtime(true);
         $this->logger->info('调用外部系统获取对比期间数据', [
-            'accountId' => $this->accountId,
-            'startDate' => $this->logic->startDate,
-            'endDate' => $this->logic->endDate,
+            'accountId' => $param->accountId,
+            'startDate' => $beforeLogicParam->startDate,
+            'endDate' => $beforeLogicParam->endDate,
         ]);
 
         try {
             // @audit-logged 已在上层实现完整的审计日志记录（调用前后、成功失败、耗时异常等）
-            $beforeList = $this->logic->execute();
+            $beforeListResult = $this->logic->execute($beforeLogicParam);
+            $beforeList = $beforeListResult->toArray()['data'] ?? [];
             $this->logger->info('对比期间外部系统调用成功', [
-                'accountId' => $this->accountId,
+                'accountId' => $param->accountId,
                 'resultCount' => count($beforeList),
                 'duration' => microtime(true) - $beforeStartTime,
             ]);
         } catch (\Throwable $e) {
             $this->logger->error('对比期间外部系统调用失败', [
-                'accountId' => $this->accountId,
+                'accountId' => $param->accountId,
                 'duration' => microtime(true) - $beforeStartTime,
                 'exception' => $e->getMessage(),
             ]);
@@ -125,7 +129,7 @@ class GetWechatMiniProgramDailyVisitTrendDataTotalByDateRange extends CacheableP
             'beforeVisitUvNewTotal' => $beforeVisitUvNewTotal,
         ]);
 
-        return $res;
+        return new ArrayResult($res);
     }
 
     public function getCacheKey(JsonRpcRequest $request): string

@@ -29,7 +29,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetMonthlyVisitTrendRequest;
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序数据月趋势')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class GetMonthlyVisitTrendCommand extends LockableCommand
+final class GetMonthlyVisitTrendCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:get-monthly-visit-trend';
 

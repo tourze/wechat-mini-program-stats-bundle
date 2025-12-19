@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace WechatMiniProgramStatsBundle\Tests\Service;
 
-use Knp\Menu\ItemInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\EasyAdminMenuBundle\Service\LinkGeneratorInterface;
 use Tourze\EasyAdminMenuBundle\Service\MenuProviderInterface;
 use Tourze\PHPUnitSymfonyWebTest\AbstractEasyAdminMenuTestCase;
 use WechatMiniProgramStatsBundle\Service\AdminMenu;
@@ -21,78 +22,30 @@ use WechatMiniProgramStatsBundle\Service\AdminMenu;
 class AdminMenuTest extends AbstractEasyAdminMenuTestCase
 {
     private AdminMenu $adminMenu;
+    private LinkGeneratorInterface $linkGenerator;
 
     protected function onSetUp(): void
     {
+        // Mock the LinkGeneratorInterface
+        $this->linkGenerator = $this->createMock(LinkGeneratorInterface::class);
+
+        // Replace the service in the container
+        self::getContainer()->set(LinkGeneratorInterface::class, $this->linkGenerator);
+
         $this->adminMenu = self::getService(AdminMenu::class);
-    }
-
-    public function testInvokeCreatesCorrectMenuStructure(): void
-    {
-        $mockMenu = $this->createMock(ItemInterface::class);
-        $mockStatsMenu = $this->createMock(ItemInterface::class);
-
-        $mockMenu->expects($this->exactly(2))
-            ->method('getChild')
-            ->with('微信小程序统计数据')
-            ->willReturnOnConsecutiveCalls(null, $mockStatsMenu)
-        ;
-
-        $mockMenu->expects($this->once())
-            ->method('addChild')
-            ->with('微信小程序统计数据')
-            ->willReturn($mockStatsMenu)
-        ;
-
-        // 期望会创建子菜单和子菜单项
-        $mockStatsMenu->expects($this->atLeastOnce())
-            ->method('getChild')
-            ->willReturn(null)
-        ;
-
-        $mockStatsMenu->expects($this->atLeastOnce())
-            ->method('addChild')
-            ->willReturn($this->createMock(ItemInterface::class))
-        ;
-
-        $this->adminMenu->__invoke($mockMenu);
-    }
-
-    public function testInvokeWithExistingMenu(): void
-    {
-        $mockMenu = $this->createMock(ItemInterface::class);
-        $mockStatsMenu = $this->createMock(ItemInterface::class);
-
-        // 模拟菜单已存在的情况
-        $mockMenu->expects($this->exactly(2))
-            ->method('getChild')
-            ->with('微信小程序统计数据')
-            ->willReturn($mockStatsMenu)
-        ;
-
-        $mockMenu->expects($this->never())
-            ->method('addChild')
-        ;
-
-        // 期望会创建子菜单项
-        $mockStatsMenu->expects($this->atLeastOnce())
-            ->method('getChild')
-            ->willReturn(null)
-        ;
-
-        $mockStatsMenu->expects($this->atLeastOnce())
-            ->method('addChild')
-            ->willReturn($this->createMock(ItemInterface::class))
-        ;
-
-        $this->adminMenu->__invoke($mockMenu);
     }
 
     public function testGetMenuItemsReturnsCorrectStructure(): void
     {
         $menuItems = $this->adminMenu->getMenuItems();
 
+        $this->assertIsArray($menuItems);
         $this->assertNotEmpty($menuItems);
+
+        // 验证所有菜单项都是有效的 MenuItemInterface 实例
+        foreach ($menuItems as $item) {
+            $this->assertInstanceOf(MenuItemInterface::class, $item);
+        }
 
         // 验证包含必要的菜单结构
         $menuLabels = [];
@@ -108,25 +61,17 @@ class AdminMenuTest extends AbstractEasyAdminMenuTestCase
         $this->assertContains('微信小程序统计数据', $menuLabels);
     }
 
-    public function testMenuItemsHaveCorrectStructure(): void
+    public function testGetMenuItemsHasCorrectStructure(): void
     {
         $menuItems = $this->adminMenu->getMenuItems();
 
-        foreach ($menuItems as $item) {
-            // 验证每个菜单项都有有效的标签
-            $itemDto = $item->getAsDto();
-            $label = $itemDto->getLabel();
-            $this->assertNotEmpty($label, 'Menu item should have non-empty label');
-
-            // 验证子菜单项有正确的结构
-            if ('submenu' === $itemDto->getType()) {
-                $subItems = $itemDto->getSubItems();
-
-                foreach ($subItems as $subItem) {
-                    $this->assertNotEmpty($subItem->getLabel(), 'Sub item should have non-empty label');
-                }
-            }
-        }
+        // 验证第一个项目是区段标题
+        $firstItem = $menuItems[0];
+        $this->assertInstanceOf(MenuItemInterface::class, $firstItem);
+        $firstItemDto = $firstItem->getAsDto();
+        $this->assertSame('section', $firstItemDto->getType());
+        $this->assertSame('微信小程序统计数据', $firstItemDto->getLabel());
+        $this->assertSame('fas fa-chart-line', $firstItemDto->getIcon());
     }
 
     public function testAllExpectedSubmenusArePresent(): void
@@ -135,6 +80,7 @@ class AdminMenuTest extends AbstractEasyAdminMenuTestCase
 
         $submenuLabels = [];
         foreach ($menuItems as $item) {
+            $this->assertInstanceOf(MenuItemInterface::class, $item);
             $itemDto = $item->getAsDto();
             if ('submenu' === $itemDto->getType()) {
                 $label = $itemDto->getLabel();
@@ -158,11 +104,133 @@ class AdminMenuTest extends AbstractEasyAdminMenuTestCase
         }
     }
 
+    public function testSubmenuItemsHaveCorrectIcons(): void
+    {
+        $menuItems = $this->adminMenu->getMenuItems();
+
+        $labelIconMap = [];
+        foreach ($menuItems as $item) {
+            $this->assertInstanceOf(MenuItemInterface::class, $item);
+            $itemDto = $item->getAsDto();
+            $label = $itemDto->getLabel();
+            if (is_string($label)) {
+                $labelIconMap[$label] = $itemDto->getIcon();
+            }
+        }
+
+        $expectedLabelIcons = [
+            '访问趋势分析' => 'fas fa-chart-area',
+            '用户画像分析' => 'fas fa-users',
+            '访问行为分析' => 'fas fa-mouse-pointer',
+            '页面访问分析' => 'fas fa-file-alt',
+            '用户留存分析' => 'fas fa-user-check',
+            '性能数据分析' => 'fas fa-tachometer-alt',
+        ];
+
+        foreach ($expectedLabelIcons as $label => $expectedIcon) {
+            $this->assertArrayHasKey($label, $labelIconMap);
+            $this->assertSame($expectedIcon, $labelIconMap[$label]);
+        }
+    }
+
+    public function testVisitTrendSubmenuHasCorrectItems(): void
+    {
+        $menuItems = $this->adminMenu->getMenuItems();
+
+        $visitTrendMenu = null;
+        foreach ($menuItems as $item) {
+            $this->assertInstanceOf(MenuItemInterface::class, $item);
+            $itemDto = $item->getAsDto();
+            if ('submenu' === $itemDto->getType() && '访问趋势分析' === $itemDto->getLabel()) {
+                $visitTrendMenu = $item;
+                break;
+            }
+        }
+
+        $this->assertNotNull($visitTrendMenu, '访问趋势分析 submenu should be present');
+
+        $subItems = $visitTrendMenu->getAsDto()->getSubItems();
+        $this->assertCount(5, $subItems);
+
+        $subItemLabels = array_map(fn ($item) => $item->getLabel(), $subItems);
+        $expectedLabels = [
+            '每日访问趋势',
+            '每周访问趋势',
+            '每月访问趋势',
+            '小时访问分布',
+            '每日汇总数据',
+        ];
+
+        foreach ($expectedLabels as $expectedLabel) {
+            $this->assertContains($expectedLabel, $subItemLabels);
+        }
+    }
+
+    public function testUserPortraitSubmenuHasCorrectItems(): void
+    {
+        $menuItems = $this->adminMenu->getMenuItems();
+
+        $userPortraitMenu = null;
+        foreach ($menuItems as $item) {
+            $this->assertInstanceOf(MenuItemInterface::class, $item);
+            $itemDto = $item->getAsDto();
+            if ('submenu' === $itemDto->getType() && '用户画像分析' === $itemDto->getLabel()) {
+                $userPortraitMenu = $item;
+                break;
+            }
+        }
+
+        $this->assertNotNull($userPortraitMenu, '用户画像分析 submenu should be present');
+
+        $subItems = $userPortraitMenu->getAsDto()->getSubItems();
+        $this->assertCount(7, $subItems);
+
+        $subItemLabels = array_map(fn ($item) => $item->getLabel(), $subItems);
+        $expectedLabels = [
+            '用户画像总览',
+            '年龄分布',
+            '性别分布',
+            '地域分布-省份',
+            '地域分布-城市',
+            '设备分布',
+            '平台分布',
+        ];
+
+        foreach ($expectedLabels as $expectedLabel) {
+            $this->assertContains($expectedLabel, $subItemLabels);
+        }
+    }
+
+    public function testAllMenuItemsHaveNonEmptyLabels(): void
+    {
+        $menuItems = $this->adminMenu->getMenuItems();
+
+        foreach ($menuItems as $item) {
+            $this->assertInstanceOf(MenuItemInterface::class, $item);
+            $itemDto = $item->getAsDto();
+            $label = $itemDto->getLabel();
+            $this->assertNotEmpty($label, 'Menu item should have non-empty label');
+
+            // 验证子菜单项也有非空标签
+            if ('submenu' === $itemDto->getType()) {
+                $subItems = $itemDto->getSubItems();
+                foreach ($subItems as $subItem) {
+                    $this->assertNotEmpty($subItem->getLabel(), 'Sub item should have non-empty label');
+                }
+            }
+        }
+    }
+
     public function testMenuImplementsMenuProviderInterface(): void
     {
         $this->assertInstanceOf(
             MenuProviderInterface::class,
             $this->adminMenu
         );
+    }
+
+    public function testAdminMenuCanBeInstantiated(): void
+    {
+        $this->assertInstanceOf(AdminMenu::class, $this->adminMenu);
     }
 }

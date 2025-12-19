@@ -87,11 +87,9 @@ final class AccessDepthInfoDataTest extends AbstractEntityTestCase
 
     public function testAccountGetterAndSetter(): void
     {
-        // 必须使用具体类 Account 而不是接口的原因：
-        // 理由1：Account 是 Doctrine Entity 类，代表数据库中的账户实体，没有对应的接口
-        // 理由2：测试需要模拟 AccessDepthInfoData 实体关联的账户对象，验证 getter/setter 方法
-        // 理由3：使用 Mock 可以避免创建真实的 Account 实例和数据库操作，提高测试速度和隔离性
-        $account = $this->createMock(Account::class);
+        $account = new Account();
+        $account->setName('Test Account');
+        $account->setAppId('test_app_id');
         self::assertNull($this->accessDepthInfoData->getAccount());
 
         $this->accessDepthInfoData->setAccount($account);
@@ -104,11 +102,9 @@ final class AccessDepthInfoDataTest extends AbstractEntityTestCase
         $date = new \DateTimeImmutable('2023-01-01');
         $dataKey = 'test_key';
         $dataValue = 'test_value';
-        // 必须使用具体类 Account 而不是接口的原因：
-        // 理由1：Account 是 Doctrine Entity 类，代表数据库中的账户实体，没有对应的接口
-        // 理由2：测试需要验证 retrieveAdminArray() 方法返回的数组包含正确的账户对象引用
-        // 理由3：使用 Mock 可以在测试中精确控制返回的对象，确保测试结果的可预测性
-        $account = $this->createMock(Account::class);
+        $account = new Account();
+        $account->setName('Test Account');
+        $account->setAppId('test_app_id');
         $createTime = new \DateTimeImmutable();
 
         $this->accessDepthInfoData->setDate($date);

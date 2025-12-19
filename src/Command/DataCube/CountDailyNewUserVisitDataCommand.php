@@ -21,7 +21,7 @@ use WechatMiniProgramStatsBundle\Repository\DailyNewUserVisitPvRepository;
 #[AsCronTask(expression: '28 5 * * *')]
 #[AsCommand(name: self::NAME, description: '新用户访问小程序次数')]
 #[Autoconfigure(public: true)]
-class CountDailyNewUserVisitDataCommand extends LockableCommand
+final class CountDailyNewUserVisitDataCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:count-daily-new-user-visit-data';
 

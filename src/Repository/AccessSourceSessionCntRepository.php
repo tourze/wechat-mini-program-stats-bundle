@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Entity\AccessSourceSessionCnt;
  * @extends ServiceEntityRepository<AccessSourceSessionCnt>
  */
 #[AsRepository(entityClass: AccessSourceSessionCnt::class)]
-class AccessSourceSessionCntRepository extends ServiceEntityRepository
+final class AccessSourceSessionCntRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

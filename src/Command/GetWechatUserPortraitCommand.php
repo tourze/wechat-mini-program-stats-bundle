@@ -22,7 +22,7 @@ use WechatMiniProgramStatsBundle\Service\WechatUserPortraitService;
 #[AsCronTask(expression: '6 21 * * *')]
 #[AsCommand(name: self::NAME, description: '获取用户用户画像分布')]
 #[Autoconfigure(public: true)]
-class GetWechatUserPortraitCommand extends LockableCommand
+final class GetWechatUserPortraitCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:user-portrait:get';
 

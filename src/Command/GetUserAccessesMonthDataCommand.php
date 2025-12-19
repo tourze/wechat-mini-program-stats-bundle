@@ -31,7 +31,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetWechatMiniUserAccessesMonth
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序月留存')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class GetUserAccessesMonthDataCommand extends LockableCommand
+final class GetUserAccessesMonthDataCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:user-accesses:month-data:get';
 

@@ -29,7 +29,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailySummaryRequest;
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序数据概况')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class GetDailySummaryCommand extends Command
+final class GetDailySummaryCommand extends Command
 {
     public const NAME = 'wechat-mini-program:get-daily-summary';
 

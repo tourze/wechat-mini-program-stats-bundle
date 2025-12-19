@@ -34,7 +34,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetDailyRetainRequest;
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序日留存')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class GetDailyRetainCommand extends LockableCommand
+final class GetDailyRetainCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:get-daily-retain';
 

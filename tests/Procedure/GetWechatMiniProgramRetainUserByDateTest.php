@@ -7,9 +7,10 @@ namespace WechatMiniProgramStatsBundle\Tests\Procedure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\DailyRetainData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramRetainUserByDateParam;
 use WechatMiniProgramStatsBundle\Procedure\GetWechatMiniProgramRetainUserByDate;
 
 /**
@@ -32,13 +33,15 @@ final class GetWechatMiniProgramRetainUserByDateTest extends AbstractProcedureTe
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramRetainUserByDate::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->date = '2023-01-01';
+        $param = new GetWechatMiniProgramRetainUserByDateParam(
+            accountId: 'invalid-account',
+            date: '2023-01-01',
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidData(): void
@@ -59,10 +62,12 @@ final class GetWechatMiniProgramRetainUserByDateTest extends AbstractProcedureTe
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramRetainUserByDate::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->date = '2023-01-01';
+        $param = new GetWechatMiniProgramRetainUserByDateParam(
+            accountId: (string) $account->getId(),
+            date: '2023-01-01',
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
         $expected = [
             'visitUv' => 0,
@@ -73,7 +78,7 @@ final class GetWechatMiniProgramRetainUserByDateTest extends AbstractProcedureTe
             'visitUvNewSevenCompare' => null,
         ];
 
-        self::assertEquals($expected, $result);
+        self::assertEquals($expected, $result->toArray());
     }
 
     public function testExecuteWithNoData(): void
@@ -87,10 +92,12 @@ final class GetWechatMiniProgramRetainUserByDateTest extends AbstractProcedureTe
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramRetainUserByDate::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->date = '2023-01-01';
+        $param = new GetWechatMiniProgramRetainUserByDateParam(
+            accountId: (string) $account->getId(),
+            date: '2023-01-01',
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
         self::assertEquals([
             'visitUv' => 0,
@@ -99,6 +106,6 @@ final class GetWechatMiniProgramRetainUserByDateTest extends AbstractProcedureTe
             'visitUvNewCompare' => null,
             'visitUvSevenCompare' => null,
             'visitUvNewSevenCompare' => null,
-        ], $result);
+        ], $result->toArray());
     }
 }

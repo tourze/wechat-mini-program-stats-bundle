@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Entity\AccessStayTimeInfoData;
  * @extends ServiceEntityRepository<AccessStayTimeInfoData>
  */
 #[AsRepository(entityClass: AccessStayTimeInfoData::class)]
-class AccessStayTimeInfoDataRepository extends ServiceEntityRepository
+final class AccessStayTimeInfoDataRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

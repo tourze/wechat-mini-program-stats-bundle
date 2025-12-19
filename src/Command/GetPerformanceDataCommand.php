@@ -30,7 +30,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetPerformanceDataRequest;
 #[AsCommand(name: self::NAME, description: '获取小程序性能数据')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class GetPerformanceDataCommand extends LockableCommand
+final class GetPerformanceDataCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:performance-data:get';
 

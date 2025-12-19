@@ -36,7 +36,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetVisitDistriButionRequest;
 #[AsCommand(name: self::NAME, description: '获取小程序访问分布数据')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class GetVisitDistributionCommand extends LockableCommand
+final class GetVisitDistributionCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:visit-distribution:get';
 

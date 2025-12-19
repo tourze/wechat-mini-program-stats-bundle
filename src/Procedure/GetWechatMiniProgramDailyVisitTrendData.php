@@ -9,14 +9,16 @@ use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
-use Tourze\JsonRPC\Core\Attribute\MethodParam;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
 use Tourze\JsonRPCCacheBundle\Procedure\CacheableProcedure;
 use Tourze\JsonRPCLogBundle\Attribute\Log;
 use WechatMiniProgramBundle\Repository\AccountRepository;
 use WechatMiniProgramStatsBundle\Entity\DailyVisitTrendData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramDailyVisitTrendDataParam;
 use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 
 #[Log]
@@ -26,12 +28,6 @@ use WechatMiniProgramStatsBundle\Repository\DailyVisitTrendDataRepository;
 #[WithMonologChannel(channel: 'procedure')]
 class GetWechatMiniProgramDailyVisitTrendData extends CacheableProcedure
 {
-    #[MethodParam(description: '小程序ID')]
-    public string $accountId = '';
-
-    #[MethodParam(description: '日期')]
-    public string $date = '';
-
     public function __construct(
         private readonly AccountRepository $accountRepository,
         private readonly DailyVisitTrendDataRepository $trendDataRepository,
@@ -39,9 +35,12 @@ class GetWechatMiniProgramDailyVisitTrendData extends CacheableProcedure
     ) {
     }
 
-    public function execute(): array
+    /**
+     * @phpstan-param GetWechatMiniProgramDailyVisitTrendDataParam $param
+     */
+    public function execute(GetWechatMiniProgramDailyVisitTrendDataParam|RpcParamInterface $param): ArrayResult
     {
-        $account = $this->accountRepository->findOneBy(['id' => $this->accountId, 'valid' => true]);
+        $account = $this->accountRepository->findOneBy(['id' => $param->accountId, 'valid' => true]);
         if (null === $account) {
             throw new ApiException('找不到小程序');
         }
@@ -49,7 +48,7 @@ class GetWechatMiniProgramDailyVisitTrendData extends CacheableProcedure
         /** @var DailyVisitTrendData|null $row */
         $row = $this->trendDataRepository->findOneBy([
             'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->startOfDay(),
+            'date' => CarbonImmutable::parse($param->date)->startOfDay(),
         ]);
         if (null === $row) {
             $row = new DailyVisitTrendData();
@@ -58,27 +57,27 @@ class GetWechatMiniProgramDailyVisitTrendData extends CacheableProcedure
         /** @var DailyVisitTrendData|null $beforeRow */
         $beforeRow = $this->trendDataRepository->findOneBy([
             'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->subDay()->startOfDay(),
+            'date' => CarbonImmutable::parse($param->date)->subDay()->startOfDay(),
         ]);
 
         /** @var DailyVisitTrendData|null $beforeSevenRow */
         $beforeSevenRow = $this->trendDataRepository->findOneBy([
             'account' => $account,
-            'date' => CarbonImmutable::parse($this->date)->subDays(7)->startOfDay(),
+            'date' => CarbonImmutable::parse($param->date)->subDays(7)->startOfDay(),
         ]);
 
         $this->logger->info('所有数据', [
-            'date' => CarbonImmutable::parse($this->date)->startOfDay(),
+            'date' => CarbonImmutable::parse($param->date)->startOfDay(),
             'row' => $row,
             'beforeRow' => $beforeRow,
             'beforeSevenRow' => $beforeSevenRow,
         ]);
 
-        return [
+        return new ArrayResult([
             ...$row->retrieveApiArray(),
             ...$this->calculateDailyComparisons($row, $beforeRow),
             ...$this->calculateSevenDayComparisons($row, $beforeSevenRow),
-        ];
+        ]);
     }
 
     /**

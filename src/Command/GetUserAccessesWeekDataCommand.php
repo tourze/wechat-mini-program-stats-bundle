@@ -30,7 +30,7 @@ use WechatMiniProgramStatsBundle\Request\DataCube\GetWechatMiniUserAccessesWeekD
 #[AsCommand(name: self::NAME, description: '获取用户访问小程序周留存')]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_mini_program_stats')]
-class GetUserAccessesWeekDataCommand extends LockableCommand
+final class GetUserAccessesWeekDataCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:user-accesses:week-data:get';
 

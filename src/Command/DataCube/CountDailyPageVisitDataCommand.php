@@ -18,7 +18,7 @@ use WechatMiniProgramStatsBundle\Repository\DailyPageVisitDataRepository;
 #[AsCronTask(expression: '34 2 * * *')]
 #[AsCronTask(expression: '28 4 * * *')]
 #[AsCommand(name: self::NAME, description: '统计每日页面访问情况')]
-class CountDailyPageVisitDataCommand extends LockableCommand
+final class CountDailyPageVisitDataCommand extends LockableCommand
 {
     public const NAME = 'wechat-mini-program:count-daily-page-visit-data';
 

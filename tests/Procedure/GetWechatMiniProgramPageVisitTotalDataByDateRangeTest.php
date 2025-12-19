@@ -7,7 +7,8 @@ namespace WechatMiniProgramStatsBundle\Tests\Procedure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramPageVisitTotalDataByDateRangeParam;
 use WechatMiniProgramStatsBundle\Procedure\GetWechatMiniProgramPageVisitTotalDataByDateRange;
 
 /**
@@ -30,13 +31,15 @@ final class GetWechatMiniProgramPageVisitTotalDataByDateRangeTest extends Abstra
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramPageVisitTotalDataByDateRange::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->startDate = '2023-01-01';
-        $procedure->endDate = '2023-01-07';
+        $param = new GetWechatMiniProgramPageVisitTotalDataByDateRangeParam(
+            accountId: 'invalid-account',
+            startDate: '2023-01-01',
+            endDate: '2023-01-07'
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 }

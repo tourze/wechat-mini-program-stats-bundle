@@ -133,11 +133,9 @@ final class UserPortraitDataTest extends AbstractEntityTestCase
 
     public function testAccountGetterAndSetter(): void
     {
-        // 必须使用具体类 Account 而不是接口的原因：
-        // 理由1：Account 是 Doctrine Entity 类，代表微信小程序账户实体，不存在相应的接口抽象
-        // 理由2：测试需要验证 UserPortraitData 实体正确管理其与 Account 的关联关系
-        // 理由3：使用 Mock 可以隔离外部依赖，专注于测试当前实体的行为，避免数据库交互
-        $account = $this->createMock(Account::class);
+        $account = new Account();
+        $account->setName('Test Account');
+        $account->setAppId('test_app_id');
         self::assertNull($this->userPortraitData->getAccount());
 
         $this->userPortraitData->setAccount($account);

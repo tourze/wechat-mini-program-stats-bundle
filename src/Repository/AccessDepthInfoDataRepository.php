@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Entity\AccessDepthInfoData;
  * @extends ServiceEntityRepository<AccessDepthInfoData>
  */
 #[AsRepository(entityClass: AccessDepthInfoData::class)]
-class AccessDepthInfoDataRepository extends ServiceEntityRepository
+final class AccessDepthInfoDataRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

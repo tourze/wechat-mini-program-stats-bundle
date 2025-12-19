@@ -7,9 +7,10 @@ namespace WechatMiniProgramStatsBundle\Tests\Procedure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramStatsBundle\Entity\DailySummaryData;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramVisitTotalUserParam;
 use WechatMiniProgramStatsBundle\Procedure\GetWechatMiniProgramVisitTotalUser;
 
 /**
@@ -32,12 +33,14 @@ final class GetWechatMiniProgramVisitTotalUserTest extends AbstractProcedureTest
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramVisitTotalUser::class);
-        $procedure->accountId = 'invalid-account';
+        $param = new GetWechatMiniProgramVisitTotalUserParam(
+            accountId: 'invalid-account'
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithValidData(): void
@@ -58,9 +61,11 @@ final class GetWechatMiniProgramVisitTotalUserTest extends AbstractProcedureTest
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramVisitTotalUser::class);
-        $procedure->accountId = (string) $account->getId();
+        $param = new GetWechatMiniProgramVisitTotalUserParam(
+            accountId: (string) $account->getId()
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
         $expected = [
             'total' => '1000',
@@ -68,7 +73,7 @@ final class GetWechatMiniProgramVisitTotalUserTest extends AbstractProcedureTest
             'totalSevenCompare' => 0,
         ];
 
-        self::assertEquals($expected, $result);
+        self::assertEquals($expected, $result->toArray());
     }
 
     public function testExecuteWithNoData(): void
@@ -82,9 +87,11 @@ final class GetWechatMiniProgramVisitTotalUserTest extends AbstractProcedureTest
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramVisitTotalUser::class);
-        $procedure->accountId = (string) $account->getId();
+        $param = new GetWechatMiniProgramVisitTotalUserParam(
+            accountId: (string) $account->getId()
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
         $expected = [
             'total' => 0,
@@ -92,6 +99,6 @@ final class GetWechatMiniProgramVisitTotalUserTest extends AbstractProcedureTest
             'totalSevenCompare' => 0,
         ];
 
-        self::assertEquals($expected, $result);
+        self::assertEquals($expected, $result->toArray());
     }
 }

@@ -13,7 +13,7 @@ use WechatMiniProgramStatsBundle\Entity\UserPortraitGendersData;
  * @extends ServiceEntityRepository<UserPortraitGendersData>
  */
 #[AsRepository(entityClass: UserPortraitGendersData::class)]
-class UserPortraitGendersDataRepository extends ServiceEntityRepository
+final class UserPortraitGendersDataRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

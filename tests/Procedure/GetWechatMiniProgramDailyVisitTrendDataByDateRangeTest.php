@@ -7,8 +7,9 @@ namespace WechatMiniProgramStatsBundle\Tests\Procedure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Exception\ApiException;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use WechatMiniProgramBundle\Entity\Account;
+use WechatMiniProgramStatsBundle\Param\GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam;
 use WechatMiniProgramStatsBundle\Procedure\GetWechatMiniProgramDailyVisitTrendDataByDateRange;
 
 /**
@@ -31,14 +32,16 @@ final class GetWechatMiniProgramDailyVisitTrendDataByDateRangeTest extends Abstr
     public function testExecuteWithInvalidAccount(): void
     {
         $procedure = self::getService(GetWechatMiniProgramDailyVisitTrendDataByDateRange::class);
-        $procedure->accountId = 'invalid-account';
-        $procedure->startDate = '2023-01-01';
-        $procedure->endDate = '2023-01-07';
+        $param = new GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam(
+            accountId: 'invalid-account',
+            startDate: '2023-01-01',
+            endDate: '2023-01-07'
+        );
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('找不到小程序');
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithNoData(): void
@@ -52,12 +55,14 @@ final class GetWechatMiniProgramDailyVisitTrendDataByDateRangeTest extends Abstr
         self::getEntityManager()->flush();
 
         $procedure = self::getService(GetWechatMiniProgramDailyVisitTrendDataByDateRange::class);
-        $procedure->accountId = (string) $account->getId();
-        $procedure->startDate = '2023-01-01';
-        $procedure->endDate = '2023-01-07';
+        $param = new GetWechatMiniProgramDailyVisitTrendDataByDateRangeParam(
+            accountId: (string) $account->getId(),
+            startDate: '2023-01-01',
+            endDate: '2023-01-07'
+        );
 
-        $result = $procedure->execute();
+        $result = $procedure->execute($param);
 
-        self::assertEquals(['data' => []], $result);
+        self::assertEquals(['data' => []], $result->toArray());
     }
 }
