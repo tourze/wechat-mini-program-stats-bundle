@@ -42,7 +42,7 @@
     "tourze/symfony-cron-job-bundle": "1.1.*",
     "tourze/symfony-dependency-service-loader": "1.0.*",
     "tourze/symfony-lock-command-bundle": "1.0.*",
-    "tourze/wechat-mini-program-bundle": "1.0.*"
+    "tourze/wechat-mini-program-bundle": "2.0.*"
   },
   "require-dev": {
     "doctrine/data-fixtures": "^2.0",
